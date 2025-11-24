@@ -111,7 +111,9 @@ const AfricaMap = () => {
         className="africa-map"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {countries.map(({ country, feature }) => {
+        {countries
+          .sort((a, b) => b.country.area - a.country.area) // Largest first, smallest on top
+          .map(({ country, feature }) => {
           // Handle both single features and feature collections
           const features = feature.type === 'FeatureCollection'
             ? feature.features
@@ -144,6 +146,7 @@ const AfricaMap = () => {
                 d={pathData}
                 className="country"
                 data-country={country.cca3}
+                vectorEffect="non-scaling-stroke"
                 onMouseMove={(e) => handleCountryHover(country, e)}
                 onMouseLeave={handleCountryLeave}
               />
