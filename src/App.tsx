@@ -1,15 +1,30 @@
 import { useState } from 'react';
-import AfricaMap from './components/AfricaMap';
+
+import RegionMap from './components/RegionMap.js';
+import type { Region } from './types/countries-json.js';
+
 import './App.css';
 
+const regions = ['Americas', 'Asia',  'Africa', 'Europe', 'Oceania', 'Antarctic']
+
 function App() {
+  const [region, setRegion] = useState<Region>("Africa")
+
+  const handleRegionChange= (region: string) => {
+    setRegion(region as Region);
+  }
+
   return (
     <div className="app">
       <header className="app-header">
-        <h1>GeoGuess - Afrika</h1>
+        <select value={region} onChange={e => handleRegionChange(e.target.value)}>
+            {regions.map(r =>
+              <option key={r}>{r}</option>
+            )}
+        </select>
       </header>
       <main className="app-main">
-        <AfricaMap />
+        <RegionMap region={region}/>
       </main>
     </div>
   );

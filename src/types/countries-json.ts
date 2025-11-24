@@ -2,37 +2,44 @@
  * Full Country type from mledoze/countries repository
  * Reference: https://github.com/mledoze/countries
  */
-export interface Country {
+
+export type Region = 'Americas' | 'Asia' |  'Africa' | 'Europe' | 'Oceania' | 'Antarctic';
+
+interface Country {
   name: {
     common: string;
     official: string;
-    native?: Record<string, { official: string; common: string }>;
+    native: Record<string, { official: string; common: string }>;
   };
-  tld?: string[];
+  tld: string[];
   cca2: string;
   cca3: string;
-  ccn3?: string;
-  cioc?: string;
-  independent?: boolean;
-  status?: string;
-  unMember?: boolean;
-  currencies?: Record<string, { name: string; symbol: string }>;
-  idd?: {
-    root?: string;
-    suffixes?: string[];
+  ccn3: string;
+  cioc: string;
+  independent: boolean;
+  status: string;
+  unMember: boolean;
+  unRegionalGroup: string;
+  currencies: Record<string, { name: string; symbol: string }>;
+  idd: {
+    root: string;
+    suffixes: string[];
   };
-  capital?: string[];
-  altSpellings?: string[];
-  region: string;
-  subregion?: string;
-  languages?: Record<string, string>;
-  translations?: Record<string, { official: string; common: string }>;
+  capital: string[];
+  altSpellings: string[];
+  region: Region;
+  subregion: string;
+  languages: Record<string, string>;
+  translations: Record<string, { official: string; common: string }>;
   latlng: [number, number];
   landlocked: boolean;
-  borders?: string[];
+  borders: string[];
   area: number;
-  demonyms?: Record<string, { f: string; m: string }>;
+  demonyms: Record<string, { f: string; m: string }>;
   flag: string;
+
+  /*
+  // Claude's electric dreams:
   maps?: {
     googleMaps?: string;
     openStreetMaps?: string;
@@ -63,6 +70,7 @@ export interface Country {
     format?: string;
     regex?: string;
   };
+  */
 }
 
 /**
@@ -71,5 +79,5 @@ export interface Country {
  */
 export type CountryData = Pick<
   Country,
-  'name' | 'cca3' | 'region' | 'capital' | 'translations' | 'latlng' | 'area' | 'flag' | 'continents'
+  'name' | 'cca3' | 'region' | 'capital' | 'translations' | 'latlng' | 'area' | 'flag'
 >;

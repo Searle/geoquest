@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
-import { geoPath, geoMercator } from 'd3-geo';
-import type { Feature, FeatureCollection, Geometry } from 'geojson';
+import { geoPath, geoMercator, geoNaturalEarth1, geoConicEqualArea, geoAlbers, geoEquirectangular } from 'd3-geo';
+import clsx from 'clsx';
+
+import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import {
-  getAfricanCountries,
+  getCountriesByRegion,
   getCountryName,
   getCapital,
   type CountryData,
-} from '../utils/countryData';
-import './AfricaMap.css';
+} from '../utils/countryData.js';
+import type { Region } from '../types/countries-json.js';
+
+import './RegionMap.css';
 
 interface CountryGeoData {
   country: CountryData;
-  feature: FeatureCollection;
+  feature: FeatureCollection | Feature<Geometry, GeoJsonProperties>;
 }
 
 interface HoverInfo {
@@ -20,17 +24,17 @@ interface HoverInfo {
   y: number;
 }
 
-const AfricaMap = () => {
+const RegionMap = ({region}: {region: Region}) => {
   const [countries, setCountries] = useState<CountryGeoData[]>([]);
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadCountryData = async () => {
-      const africanCountries = getAfricanCountries();
+      const regionCountries = getCountriesByRegion(region);
 
       // Load GeoJSON for each country
-      const countryDataPromises = africanCountries.map(async (country) => {
+      const countryDataPromises = regionCountries.map(async (country) => {
         try {
           const response = await fetch(
             `/data/countries/data/${country.cca3.toLowerCase()}.geo.json`
@@ -56,7 +60,7 @@ const AfricaMap = () => {
     };
 
     loadCountryData();
-  }, []);
+  }, [region]);
 
   const handleCountryHover = (
     country: CountryData,
@@ -84,7 +88,7 @@ const AfricaMap = () => {
     features: allFeatures,
   };
 
-  const projection = geoMercator()
+  const projection = geoNaturalEarth1()
     .fitSize([1000, 1000], featureCollection)
     .preclip((stream) => stream);  // Disable antimeridian clipping
 
@@ -98,17 +102,17 @@ const AfricaMap = () => {
 
   if (loading) {
     return (
-      <div className="africa-map-container">
+      <div className="region-map-container">
         <div className="loading">Loading map data...</div>
       </div>
     );
   }
 
   return (
-    <div className="africa-map-container">
+    <div className="region-map-container">
       <svg
         viewBox={`${x0} ${y0} ${width} ${height}`}
-        className="africa-map"
+        className="region-map"
         xmlns="http://www.w3.org/2000/svg"
       >
         {countries
@@ -140,16 +144,34 @@ const AfricaMap = () => {
             const pathData = pathGenerator(filteredFeature);
             if (!pathData) return null;
 
+            // Dynamic hit area size based on country area
+            // Smaller countries get larger hit areas for better UX
+            const hitAreaSize = country.area < 30000 ? 20 :
+                               country.area < 100000 ? 15 : 10;
+
+            const hovered = hoverInfo?.country === country;
+
             return (
-              <path
-                key={`${country.cca3}-${index}`}
-                d={pathData}
-                className="country"
-                data-country={country.cca3}
-                vectorEffect="non-scaling-stroke"
-                onMouseMove={(e) => handleCountryHover(country, e)}
-                onMouseLeave={handleCountryLeave}
-              />
+              <g key={`${country.cca3}-${index}`}>
+                {/* Invisible hit area with thick stroke for edges and fill for interior */}
+                <path
+                  d={pathData}
+                  fill="transparent"
+                  stroke="transparent"
+                  strokeWidth={hitAreaSize}
+                  vectorEffect="non-scaling-stroke"
+                  onMouseMove={(e) => handleCountryHover(country, e)}
+                  onMouseLeave={handleCountryLeave}
+                />
+                {/* Visible path */}
+                <path
+                  d={pathData}
+                  className={clsx("country", {hovered})}
+                  data-country={country.cca3}
+                  vectorEffect="non-scaling-stroke"
+                  style={{ pointerEvents: 'none' }}
+                />
+              </g>
             );
           });
         })}
@@ -164,7 +186,7 @@ const AfricaMap = () => {
           }}
         >
           <div className="country-name">
-            {getCountryName(hoverInfo.country, 'de')}
+            {getCountryName(hoverInfo.country, 'deu')}
           </div>
           <div className="country-capital">
             Hauptstadt: {getCapital(hoverInfo.country)}
@@ -175,4 +197,4 @@ const AfricaMap = () => {
   );
 };
 
-export default AfricaMap;
+export default RegionMap;

@@ -1,4 +1,4 @@
-.africa-map-container {
+.region-map-container {
   position: relative;
   width: 100%;
   max-width: 1200px;
@@ -8,7 +8,7 @@
   padding: 0;
 }
 
-.africa-map {
+.region-map {
   width: 100%;
   height: auto;
 }
@@ -21,11 +21,9 @@
   transition: all 0.2s ease;
 }
 
-.country:hover {
-  fill: #e74c3c;
-  stroke: #c0392b;
-  stroke-width: 2;
-  filter: brightness(1.1);
+.country.hovered {
+  fill: #51b6fa;
+  --x-filter: brightness(1.1);
 }
 
 .country-tooltip {
