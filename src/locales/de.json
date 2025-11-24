@@ -1,0 +1,220 @@
+{
+  "countries": {
+    "DZ": {
+      "name": "Algerien",
+      "capital": "Algier"
+    },
+    "AO": {
+      "name": "Angola",
+      "capital": "Luanda"
+    },
+    "BJ": {
+      "name": "Benin",
+      "capital": "Porto-Novo"
+    },
+    "BW": {
+      "name": "Botswana",
+      "capital": "Gaborone"
+    },
+    "BF": {
+      "name": "Burkina Faso",
+      "capital": "Ouagadougou"
+    },
+    "BI": {
+      "name": "Burundi",
+      "capital": "Gitega"
+    },
+    "CM": {
+      "name": "Kamerun",
+      "capital": "Yaoundé"
+    },
+    "CV": {
+      "name": "Kap Verde",
+      "capital": "Praia"
+    },
+    "CF": {
+      "name": "Zentralafrikanische Republik",
+      "capital": "Bangui"
+    },
+    "TD": {
+      "name": "Tschad",
+      "capital": "N'Djamena"
+    },
+    "KM": {
+      "name": "Komoren",
+      "capital": "Moroni"
+    },
+    "CG": {
+      "name": "Republik Kongo",
+      "capital": "Brazzaville"
+    },
+    "CD": {
+      "name": "Demokratische Republik Kongo",
+      "capital": "Kinshasa"
+    },
+    "CI": {
+      "name": "Elfenbeinküste",
+      "capital": "Yamoussoukro"
+    },
+    "DJ": {
+      "name": "Dschibuti",
+      "capital": "Dschibuti"
+    },
+    "EG": {
+      "name": "Ägypten",
+      "capital": "Kairo"
+    },
+    "GQ": {
+      "name": "Äquatorialguinea",
+      "capital": "Malabo"
+    },
+    "ER": {
+      "name": "Eritrea",
+      "capital": "Asmara"
+    },
+    "SZ": {
+      "name": "Eswatini",
+      "capital": "Mbabane"
+    },
+    "ET": {
+      "name": "Äthiopien",
+      "capital": "Addis Abeba"
+    },
+    "GA": {
+      "name": "Gabun",
+      "capital": "Libreville"
+    },
+    "GM": {
+      "name": "Gambia",
+      "capital": "Banjul"
+    },
+    "GH": {
+      "name": "Ghana",
+      "capital": "Accra"
+    },
+    "GN": {
+      "name": "Guinea",
+      "capital": "Conakry"
+    },
+    "GW": {
+      "name": "Guinea-Bissau",
+      "capital": "Bissau"
+    },
+    "KE": {
+      "name": "Kenia",
+      "capital": "Nairobi"
+    },
+    "LS": {
+      "name": "Lesotho",
+      "capital": "Maseru"
+    },
+    "LR": {
+      "name": "Liberia",
+      "capital": "Monrovia"
+    },
+    "LY": {
+      "name": "Libyen",
+      "capital": "Tripolis"
+    },
+    "MG": {
+      "name": "Madagaskar",
+      "capital": "Antananarivo"
+    },
+    "MW": {
+      "name": "Malawi",
+      "capital": "Lilongwe"
+    },
+    "ML": {
+      "name": "Mali",
+      "capital": "Bamako"
+    },
+    "MR": {
+      "name": "Mauretanien",
+      "capital": "Nouakchott"
+    },
+    "MU": {
+      "name": "Mauritius",
+      "capital": "Port Louis"
+    },
+    "MA": {
+      "name": "Marokko",
+      "capital": "Rabat"
+    },
+    "MZ": {
+      "name": "Mosambik",
+      "capital": "Maputo"
+    },
+    "NA": {
+      "name": "Namibia",
+      "capital": "Windhoek"
+    },
+    "NE": {
+      "name": "Niger",
+      "capital": "Niamey"
+    },
+    "NG": {
+      "name": "Nigeria",
+      "capital": "Abuja"
+    },
+    "RW": {
+      "name": "Ruanda",
+      "capital": "Kigali"
+    },
+    "ST": {
+      "name": "São Tomé und Príncipe",
+      "capital": "São Tomé"
+    },
+    "SN": {
+      "name": "Senegal",
+      "capital": "Dakar"
+    },
+    "SC": {
+      "name": "Seychellen",
+      "capital": "Victoria"
+    },
+    "SL": {
+      "name": "Sierra Leone",
+      "capital": "Freetown"
+    },
+    "SO": {
+      "name": "Somalia",
+      "capital": "Mogadischu"
+    },
+    "ZA": {
+      "name": "Südafrika",
+      "capital": "Pretoria"
+    },
+    "SS": {
+      "name": "Südsudan",
+      "capital": "Juba"
+    },
+    "SD": {
+      "name": "Sudan",
+      "capital": "Khartum"
+    },
+    "TZ": {
+      "name": "Tansania",
+      "capital": "Dodoma"
+    },
+    "TG": {
+      "name": "Togo",
+      "capital": "Lomé"
+    },
+    "TN": {
+      "name": "Tunesien",
+      "capital": "Tunis"
+    },
+    "UG": {
+      "name": "Uganda",
+      "capital": "Kampala"
+    },
+    "ZM": {
+      "name": "Sambia",
+      "capital": "Lusaka"
+    },
+    "ZW": {
+      "name": "Simbabwe",
+      "capital": "Harare"
+    }
+  }
+}

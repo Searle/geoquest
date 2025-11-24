@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+yarn-error.log
+npm-debug.log*
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+tmp/
+temp/
+
+# Downloaded data files
+africa.geojson
+convert-geojson-to-svg.js
