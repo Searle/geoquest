@@ -1,0 +1,15 @@
+# Dependencies
+/node_modules
+
+# Build artifacts and caches
+/dist
+/build
+/.vite
+/public/data
+/data
+
+# Logs and Caches
+yarn-debug.log*
+yarn-error.log*
+*.log
+/coverage

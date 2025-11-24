@@ -1,61 +1,61 @@
 .region-map-container {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 0;
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 0;
 }
 
 .region-map {
-  width: 100%;
-  height: auto;
+    width: 100%;
+    height: auto;
 }
 
 .country {
-  fill: #3498db;
-  stroke: #2c3e50;
-  stroke-width: 1px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    fill: #3498db;
+    stroke: #2c3e50;
+    stroke-width: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .country.hovered {
-  fill: #51b6fa;
-  --x-filter: brightness(1.1);
+    fill: #51b6fa;
+    --x-filter: brightness(1.1);
 }
 
 .country-tooltip {
-  position: fixed;
-  background-color: rgba(44, 62, 80, 0.95);
-  color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  pointer-events: none;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  font-size: 0.95rem;
-  min-width: 200px;
+    position: fixed;
+    background-color: rgba(44, 62, 80, 0.95);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.95rem;
+    min-width: 200px;
 }
 
 .country-name {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-  color: #ecf0f1;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: #ecf0f1;
 }
 
 .country-capital {
-  color: #bdc3c7;
-  font-size: 0.9rem;
+    color: #bdc3c7;
+    font-size: 0.9rem;
 }
 
 .loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  font-size: 1.2rem;
-  color: #7f8c8d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.2rem;
+    color: #7f8c8d;
 }

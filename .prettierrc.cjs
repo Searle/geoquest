@@ -1,0 +1,7 @@
+/** @type {import("prettier").Config} */
+module.exports = {
+    tabWidth: 4,
+    printWidth: 120,
+    singleQuote: true,
+    jsxSingleQuote: true,
+};
