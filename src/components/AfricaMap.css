@@ -1,11 +1,11 @@
 .africa-map-container {
   position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  padding: 0;
 }
 
 .africa-map {
@@ -51,4 +51,13 @@
 .country-capital {
   color: #bdc3c7;
   font-size: 0.9rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.2rem;
+  color: #7f8c8d;
 }

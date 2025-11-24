@@ -27,7 +27,3 @@ Thumbs.db
 *.log
 tmp/
 temp/
-
-# Downloaded data files
-africa.geojson
-convert-geojson-to-svg.js
