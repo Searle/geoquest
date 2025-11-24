@@ -20,7 +20,7 @@ export const getCountryGeoJsonPath = (cca3: string): string => `/data/countries/
 export const getCountryFlagPath = (cca3: string): string => `/data/countries/data/${cca3.toLowerCase()}.svg`;
 
 // Get country name in a specific language
-export const getCountryName = (country: CountryData, language: string = 'de'): string => {
+export const getCountryName = (country: CountryData, language: string = 'deu'): string => {
     // Try translations first
     if (country.translations?.[language]) {
         return country.translations[language].common;

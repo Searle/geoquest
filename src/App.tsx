@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import RegionMap from './components/RegionMap.js';
+import GameMap from './components/GameMap.js';
 import type { Region } from './types/countries-json.js';
 
 import './App.css';
@@ -24,7 +24,7 @@ function App() {
                 </select>
             </header>
             <main className='app-main'>
-                <RegionMap region={region} />
+                <GameMap region={region} />
             </main>
         </div>
     );
