@@ -20,6 +20,7 @@ interface RegionMapProps {
     onCountryLeave?: () => void;
     getCountryHighlight?: (country: CountryData) => 'correct' | 'incorrect' | 'hovered' | null;
     onCountriesLoaded?: (countries: CountryData[]) => void;
+    isAnsweredCorrectly?: (country: CountryData) => boolean;
 }
 
 /**
@@ -33,6 +34,7 @@ const RegionMap = ({
     onCountryLeave,
     getCountryHighlight,
     onCountriesLoaded,
+    isAnsweredCorrectly,
 }: RegionMapProps) => {
     const [countries, setCountries] = useState<CountryGeoData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -103,7 +105,17 @@ const RegionMap = ({
     return (
         <svg viewBox={`${x0} ${y0} ${width} ${height}`} className='region-map' xmlns='http://www.w3.org/2000/svg'>
             {countries
-                .sort((a, b) => b.country.area - a.country.area) // Largest first, smallest on top
+                .sort((a, b) => {
+                    // Draw answered countries first (behind unanswered ones)
+                    if (isAnsweredCorrectly) {
+                        const aAnswered = isAnsweredCorrectly(a.country);
+                        const bAnswered = isAnsweredCorrectly(b.country);
+                        if (aAnswered && !bAnswered) return -1;
+                        if (!aAnswered && bAnswered) return 1;
+                    }
+                    // Within same category, largest first
+                    return b.country.area - a.country.area;
+                })
                 .map(({ country, feature }) => {
                     // Handle both single features and feature collections
                     const features = feature.type === 'FeatureCollection' ? feature.features : [feature];

@@ -202,6 +202,7 @@ const GameMap = () => {
                     onCountryLeave={handleCountryLeave}
                     getCountryHighlight={getCountryHighlight}
                     onCountriesLoaded={handleCountriesLoaded}
+                    isAnsweredCorrectly={quiz.isAnsweredCorrectly}
                 />
             </div>
 
