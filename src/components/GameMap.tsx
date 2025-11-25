@@ -8,7 +8,7 @@ import { useQuiz } from '../hooks/useQuiz.js';
 
 import './GameMap.css';
 
-type GameMode = 'discover' | 'quiz';
+type GameMode = 'discover' | 'country' | 'capital';
 
 interface HoverInfo {
     country: CountryData;
@@ -41,9 +41,14 @@ const GameMap = () => {
     const feedback = quizState?.feedback;
 
     // Mode switching
-    const handleStartQuiz = () => {
+    const handleStartCountryQuiz = () => {
         startQuiz();
-        setGameMode('quiz');
+        setGameMode('country');
+    };
+
+    const handleStartCapitalQuiz = () => {
+        startQuiz();
+        setGameMode('capital');
     };
 
     const handleStartDiscover = () => {
@@ -53,7 +58,7 @@ const GameMap = () => {
 
     // Dismiss incorrect feedback on any click
     const handleDismissIncorrect = () => {
-        if (gameMode === 'quiz' && feedback === 'incorrect') {
+        if (gameMode !== 'discover' && feedback === 'incorrect') {
             clearFeedback();
             setClickPosition(null);
         }
@@ -62,7 +67,7 @@ const GameMap = () => {
     // Country interaction handlers
     const handleCountryClick = useCallback(
         (country: CountryData, event?: React.MouseEvent) => {
-            if (gameMode === 'quiz') {
+            if (gameMode !== 'discover') {
                 // Don't allow clicking on already correctly answered countries
                 if (isAnsweredCorrectly(country)) {
                     return;
@@ -98,7 +103,7 @@ const GameMap = () => {
     // Determine country highlight state
     const getCountryHighlight = useCallback(
         (country: CountryData): 'correct' | 'incorrect' | 'hovered' | null => {
-            if (gameMode === 'quiz') {
+            if (gameMode !== 'discover') {
                 // Quiz mode
                 // Show all correctly answered countries in green
                 if (isAnsweredCorrectly(country)) return 'correct';
@@ -127,7 +132,7 @@ const GameMap = () => {
         <div className='region-map-container'>
             {/* Fixed header section */}
             <div className='game-header'>
-                {gameMode !== 'quiz' && (
+                {gameMode === 'discover' && (
                     <div className='game-header-item'>
                         <select
                             className='mode-select'
@@ -141,16 +146,23 @@ const GameMap = () => {
 
                         <button
                             className={clsx('mode-button')}
-                            onClick={handleStartQuiz}
+                            onClick={handleStartCountryQuiz}
                             disabled={countries.length === 0}
                         >
-                            Quiz starten
+                            Länder-Quiz starten
+                        </button>
+                        <button
+                            className={clsx('mode-button')}
+                            onClick={handleStartCapitalQuiz}
+                            disabled={countries.length === 0}
+                        >
+                            Hauptstadt-Quiz starten
                         </button>
                     </div>
                 )}
 
                 {/* Quiz UI */}
-                {gameMode === 'quiz' && quizState && !quiz.isCompleted && (
+                {gameMode !== 'discover' && quizState && !quiz.isCompleted && (
                     <>
                         <div className='game-header-item'>
                             <span className='quiz-score'>
@@ -160,7 +172,11 @@ const GameMap = () => {
                             </span>
                             <span className='quiz-click-on'>Klicke:</span>
                             <span className='quiz-question'>
-                                <strong>{getCountryName(quiz.currentQuestion!, 'deu')}</strong>
+                                <strong>
+                                    {gameMode === 'capital'
+                                        ? getCapital(quiz.currentQuestion!)
+                                        : getCountryName(quiz.currentQuestion!, 'deu')}
+                                </strong>
                             </span>
                         </div>
                         <div className='game-header-item'>
@@ -180,13 +196,16 @@ const GameMap = () => {
             {/* Scrollable content section */}
             <div className='game-content'>
                 {/* Quiz completed */}
-                {gameMode === 'quiz' && quiz.isCompleted && quizState && (
+                {gameMode !== 'discover' && quiz.isCompleted && quizState && (
                     <div className='quiz-completed'>
                         <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
                             <div>Fehlversuche: {quizState.incorrectCount}</div>
                         </div>
-                        <button className='mode-button' onClick={handleStartQuiz}>
+                        <button
+                            className='mode-button'
+                            onClick={gameMode === 'capital' ? handleStartCapitalQuiz : handleStartCountryQuiz}
+                        >
                             Nochmal starten
                         </button>
                     </div>
@@ -201,7 +220,6 @@ const GameMap = () => {
                     getCountryHighlight={getCountryHighlight}
                     onCountriesLoaded={handleCountriesLoaded}
                     isAnsweredCorrectly={isAnsweredCorrectly}
-                    incorrectCountry={clickedCountry}
                 />
             </div>
 
@@ -220,12 +238,12 @@ const GameMap = () => {
             )}
 
             {/* Click-anywhere overlay to dismiss incorrect feedback */}
-            {gameMode === 'quiz' && feedback === 'incorrect' && (
+            {gameMode !== 'discover' && feedback === 'incorrect' && (
                 <div className='dismiss-overlay' onClick={handleDismissIncorrect} />
             )}
 
             {/* Incorrect country label (quiz mode) */}
-            {gameMode === 'quiz' && clickedCountry && feedback === 'incorrect' && clickPosition && (
+            {gameMode !== 'discover' && clickedCountry && feedback === 'incorrect' && clickPosition && (
                 <div
                     className='incorrect-country-label'
                     style={{
@@ -236,7 +254,16 @@ const GameMap = () => {
                                 : `${clickPosition.y + 20}px`,
                     }}
                 >
-                    {getCountryName(clickedCountry, 'deu')}
+                    {gameMode === 'capital' ? (
+                        <>
+                            <div style={{ fontSize: '1em', fontWeight: 'bold' }}>{getCapital(clickedCountry)}</div>
+                            <div style={{ fontSize: '0.8em', opacity: 0.8 }}>
+                                {getCountryName(clickedCountry, 'deu')}
+                            </div>
+                        </>
+                    ) : (
+                        getCountryName(clickedCountry, 'deu')
+                    )}
                 </div>
             )}
         </div>
