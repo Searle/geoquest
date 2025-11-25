@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, memo, useRef, useCallback } from 'react';
-import { geoPath, geoNaturalEarth1, geoMercatorRaw, geoMercator } from 'd3-geo';
+import { geoPath, geoMercator } from 'd3-geo';
 import clsx from 'clsx';
 
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
@@ -112,9 +112,9 @@ const Country = memo<CountryProps>(
                                 stroke='transparent'
                                 strokeWidth={hitAreaSize}
                                 vectorEffect='non-scaling-stroke'
-                                onMouseMove={(e) => onCountryHover?.(country, e)}
-                                onMouseLeave={() => onCountryLeave?.()}
-                                onClick={(e) => onCountryClick?.(country, e)}
+                                onMouseMove={(e) => onCountryHover(country, e)}
+                                onMouseLeave={() => onCountryLeave()}
+                                onClick={(e) => onCountryClick(country, e)}
                             />
                             {/* Visible path */}
                             <path
@@ -154,7 +154,6 @@ const RegionMap = ({
 }: RegionMapProps) => {
     const [countries, setCountries] = useState<CountryGeoData[]>([]);
     const [loading, setLoading] = useState(true);
-    const [hoveredCountry, setHoveredCountry] = useState<CountryData | null>(null);
 
     useEffect(() => {
         const loadCountryData = async () => {
@@ -223,24 +222,8 @@ const RegionMap = ({
     }, [countries]);
 
     // Split countries into answered and unanswered groups
-    const answeredCountries = countries.filter(({ country }) => isAnsweredCorrectly?.(country));
-    const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly?.(country));
-
-    // Wrapper handlers to track hover state locally
-    const handleCountryHoverInternal = useCallback(
-        (country: CountryData, event: React.MouseEvent<SVGPathElement>) => {
-            if (!isAnsweredCorrectly?.(country)) {
-                setHoveredCountry(country);
-            }
-            onCountryHover?.(country, event);
-        },
-        [onCountryHover],
-    );
-
-    const handleCountryLeaveInternal = useCallback(() => {
-        setHoveredCountry(null);
-        onCountryLeave?.();
-    }, [onCountryLeave]);
+    const answeredCountries = countries.filter(({ country }) => isAnsweredCorrectly(country));
+    const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly(country));
 
     if (loading) {
         return <div className='loading'>Loading map data...</div>;
@@ -254,14 +237,16 @@ const RegionMap = ({
 
     // Get highlight state for main SVG (only 'correct', hovered/incorrect in overlay)
     const getMainHighlight = (country: CountryData): 'correct' | null => {
-        const highlight = getCountryHighlight?.(country);
+        const highlight = getCountryHighlight(country);
         return highlight === 'correct' ? 'correct' : null;
     };
 
-    // Determine which country to show in overlay (hovered or incorrect)
-    const overlayCountry = hoveredCountry || incorrectCountry;
-    const overlayHighlight = hoveredCountry ? 'hovered' : 'incorrect';
-    const overlayCountryData = overlayCountry ? countries.find((c) => c.country.cca3 === overlayCountry.cca3) : null;
+    // Find country to show in overlay (hovered or incorrect) using getCountryHighlight
+    const overlayCountryData = countries.find(({ country }) => {
+        const highlight = getCountryHighlight(country);
+        return highlight === 'hovered' || highlight === 'incorrect';
+    });
+    const overlayHighlight = overlayCountryData ? getCountryHighlight(overlayCountryData.country) : null;
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -286,8 +271,8 @@ const RegionMap = ({
                         feature={feature}
                         pathGenerator={pathGenerator}
                         onCountryClick={onCountryClick}
-                        onCountryHover={handleCountryHoverInternal}
-                        onCountryLeave={handleCountryLeaveInternal}
+                        onCountryHover={onCountryHover}
+                        onCountryLeave={onCountryLeave}
                         highlightState={getMainHighlight(country)}
                     />
                 ))}
@@ -301,8 +286,8 @@ const RegionMap = ({
                             feature={feature}
                             pathGenerator={pathGenerator}
                             onCountryClick={onCountryClick}
-                            onCountryHover={handleCountryHoverInternal}
-                            onCountryLeave={handleCountryLeaveInternal}
+                            onCountryHover={onCountryHover}
+                            onCountryLeave={onCountryLeave}
                             highlightState={getMainHighlight(country)}
                         />
                     ))}
@@ -310,7 +295,7 @@ const RegionMap = ({
             </svg>
 
             {/* Overlay - renders hovered or incorrect country on top */}
-            {overlayCountryData && (
+            {overlayCountryData && overlayHighlight && (
                 <svg
                     viewBox={`${viewBox.x0} ${viewBox.y0} ${viewBox.width} ${viewBox.height}`}
                     className='region-map-overlay'
@@ -322,8 +307,8 @@ const RegionMap = ({
                         feature={overlayCountryData.feature}
                         pathGenerator={pathGenerator}
                         onCountryClick={onCountryClick}
-                        onCountryHover={handleCountryHoverInternal}
-                        onCountryLeave={handleCountryLeaveInternal}
+                        onCountryHover={onCountryHover}
+                        onCountryLeave={onCountryLeave}
                         highlightState={overlayHighlight}
                     />
                 </svg>
