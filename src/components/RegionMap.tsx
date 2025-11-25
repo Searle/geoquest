@@ -106,6 +106,13 @@ const RegionMap = ({
         <svg viewBox={`${x0} ${y0} ${width} ${height}`} className='region-map' xmlns='http://www.w3.org/2000/svg'>
             {countries
                 .sort((a, b) => {
+                    const aHighlight = getCountryHighlight?.(a.country);
+                    const bHighlight = getCountryHighlight?.(b.country);
+
+                    // Hovered country always drawn last (on top)
+                    if (aHighlight === 'hovered' && bHighlight !== 'hovered') return 1;
+                    if (bHighlight === 'hovered' && aHighlight !== 'hovered') return -1;
+
                     // Draw answered countries first (behind unanswered ones)
                     if (isAnsweredCorrectly) {
                         const aAnswered = isAnsweredCorrectly(a.country);
@@ -113,6 +120,7 @@ const RegionMap = ({
                         if (aAnswered && !bAnswered) return -1;
                         if (!aAnswered && bAnswered) return 1;
                     }
+
                     // Within same category, largest first
                     return b.country.area - a.country.area;
                 })

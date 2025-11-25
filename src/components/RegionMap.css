@@ -15,7 +15,7 @@
 
 .country.hovered {
     fill: #51b6fa;
-    stroke-width: 3px;
+    stroke-width: 2px;
 }
 
 /* Quiz feedback styles */
