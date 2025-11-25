@@ -36,76 +36,84 @@ const GameMap = () => {
 
     const quiz = useQuiz(countries);
 
+    // Destructure quiz values for stable dependencies
+    const { startQuiz, resetQuiz, clearFeedback, handleAnswer, isAnsweredCorrectly, clickedCountry, quizState } = quiz;
+    const feedback = quizState?.feedback;
+
     // Mode switching
     const handleStartQuiz = () => {
-        quiz.startQuiz();
+        startQuiz();
         setGameMode('quiz');
     };
 
     const handleStartDiscover = () => {
-        quiz.resetQuiz();
+        resetQuiz();
         setGameMode('discover');
     };
 
     // Dismiss incorrect feedback on any click
     const handleDismissIncorrect = () => {
-        if (gameMode === 'quiz' && quiz.quizState?.feedback === 'incorrect') {
-            quiz.clearFeedback();
+        if (gameMode === 'quiz' && feedback === 'incorrect') {
+            clearFeedback();
             setClickPosition(null);
         }
     };
 
     // Country interaction handlers
-    const handleCountryClick = (country: CountryData, event?: React.MouseEvent) => {
-        if (gameMode === 'quiz') {
-            // Don't allow clicking on already correctly answered countries
-            if (quiz.isAnsweredCorrectly(country)) {
-                return;
-            }
+    const handleCountryClick = useCallback(
+        (country: CountryData, event?: React.MouseEvent) => {
+            if (gameMode === 'quiz') {
+                // Don't allow clicking on already correctly answered countries
+                if (isAnsweredCorrectly(country)) {
+                    return;
+                }
 
-            // If showing incorrect feedback, dismiss it (handled by overlay)
-            if (quiz.quizState?.feedback === 'incorrect') {
-                return;
-            }
+                // If showing incorrect feedback, dismiss it (handled by overlay)
+                if (feedback === 'incorrect') {
+                    return;
+                }
 
-            // Store click position for showing label
-            if (event) {
-                setClickPosition({ x: event.clientX, y: event.clientY });
+                // Store click position for showing label
+                if (event) {
+                    setClickPosition({ x: event.clientX, y: event.clientY });
+                }
+                handleAnswer(country);
             }
-            quiz.handleAnswer(country);
-        }
-    };
+        },
+        [gameMode, isAnsweredCorrectly, handleAnswer, feedback],
+    );
 
-    const handleCountryHover = (country: CountryData, event: React.MouseEvent<SVGPathElement>) => {
+    const handleCountryHover = useCallback((country: CountryData, event: React.MouseEvent<SVGPathElement>) => {
         setHoverInfo({
             country,
             x: event.clientX,
             y: event.clientY,
         });
-    };
+    }, []);
 
-    const handleCountryLeave = () => {
+    const handleCountryLeave = useCallback(() => {
         setHoverInfo(null);
-    };
+    }, []);
 
     // Determine country highlight state
-    const getCountryHighlight = (country: CountryData): 'correct' | 'incorrect' | 'hovered' | null => {
-        if (gameMode === 'quiz') {
-            // Quiz mode
-            // Show all correctly answered countries in green
-            if (quiz.isAnsweredCorrectly(country)) return 'correct';
+    const getCountryHighlight = useCallback(
+        (country: CountryData): 'correct' | 'incorrect' | 'hovered' | null => {
+            if (gameMode === 'quiz') {
+                // Quiz mode
+                // Show all correctly answered countries in green
+                if (isAnsweredCorrectly(country)) return 'correct';
 
-            // Highlight the clicked wrong country
-            const isClickedWrong =
-                quiz.clickedCountry &&
-                country.cca3 === quiz.clickedCountry.cca3 &&
-                quiz.quizState?.feedback === 'incorrect';
-            if (isClickedWrong) return 'incorrect';
-        }
-        if (hoverInfo?.country === country) return 'hovered';
+                // Highlight the clicked wrong country
+                const isClickedWrong =
+                    clickedCountry && country.cca3 === clickedCountry.cca3 && feedback === 'incorrect';
+                if (isClickedWrong) return 'incorrect';
+            }
+            if (hoverInfo?.country === country) return 'hovered';
 
-        return null;
-    };
+            return null;
+        },
+        [gameMode, isAnsweredCorrectly, clickedCountry, feedback, hoverInfo],
+    );
 
     // Pass countries up from RegionMap
     const handleCountriesLoaded = useCallback(
@@ -142,13 +150,13 @@ const GameMap = () => {
                 )}
 
                 {/* Quiz UI */}
-                {gameMode === 'quiz' && quiz.quizState && !quiz.isCompleted && (
+                {gameMode === 'quiz' && quizState && !quiz.isCompleted && (
                     <>
                         <div className='game-header-item'>
                             <span className='quiz-score'>
                                 <span className='correct'>✔</span>
                                 &nbsp;
-                                {quiz.quizState.answeredCorrectly.size} / {quiz.quizState.randomizedCountries.length}
+                                {quizState.answeredCorrectly.size} / {quizState.randomizedCountries.length}
                             </span>
                             <span className='quiz-click-on'>Klicke:</span>
                             <span className='quiz-question'>
@@ -159,7 +167,7 @@ const GameMap = () => {
                             <div className='quiz-score'>
                                 <span className='incorrect'>↻</span>
                                 &nbsp;
-                                {quiz.quizState.incorrectCount}
+                                {quizState.incorrectCount}
                             </div>
                             <button className={clsx('mode-button')} onClick={handleStartDiscover}>
                                 Abbrechen
@@ -172,11 +180,11 @@ const GameMap = () => {
             {/* Scrollable content section */}
             <div className='game-content'>
                 {/* Quiz completed */}
-                {gameMode === 'quiz' && quiz.isCompleted && quiz.quizState && (
+                {gameMode === 'quiz' && quiz.isCompleted && quizState && (
                     <div className='quiz-completed'>
                         <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
-                            <div>Fehlversuche: {quiz.quizState.incorrectCount}</div>
+                            <div>Fehlversuche: {quizState.incorrectCount}</div>
                         </div>
                         <button className='mode-button' onClick={handleStartQuiz}>
                             Nochmal starten
@@ -192,7 +200,7 @@ const GameMap = () => {
                     onCountryLeave={handleCountryLeave}
                     getCountryHighlight={getCountryHighlight}
                     onCountriesLoaded={handleCountriesLoaded}
-                    isAnsweredCorrectly={quiz.isAnsweredCorrectly}
+                    isAnsweredCorrectly={isAnsweredCorrectly}
                 />
             </div>
 
@@ -211,28 +219,25 @@ const GameMap = () => {
             )}
 
             {/* Click-anywhere overlay to dismiss incorrect feedback */}
-            {gameMode === 'quiz' && quiz.quizState?.feedback === 'incorrect' && (
+            {gameMode === 'quiz' && feedback === 'incorrect' && (
                 <div className='dismiss-overlay' onClick={handleDismissIncorrect} />
             )}
 
             {/* Incorrect country label (quiz mode) */}
-            {gameMode === 'quiz' &&
-                quiz.clickedCountry &&
-                quiz.quizState?.feedback === 'incorrect' &&
-                clickPosition && (
-                    <div
-                        className='incorrect-country-label'
-                        style={{
-                            left: `${clickPosition.x}px`,
-                            top:
-                                clickPosition.y > window.innerHeight * 0.9
-                                    ? `${clickPosition.y - 60}px`
-                                    : `${clickPosition.y + 20}px`,
-                        }}
-                    >
-                        {getCountryName(quiz.clickedCountry, 'deu')}
-                    </div>
-                )}
+            {gameMode === 'quiz' && clickedCountry && feedback === 'incorrect' && clickPosition && (
+                <div
+                    className='incorrect-country-label'
+                    style={{
+                        left: `${clickPosition.x}px`,
+                        top:
+                            clickPosition.y > window.innerHeight * 0.9
+                                ? `${clickPosition.y - 60}px`
+                                : `${clickPosition.y + 20}px`,
+                    }}
+                >
+                    {getCountryName(clickedCountry, 'deu')}
+                </div>
+            )}
         </div>
     );
 };
