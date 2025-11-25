@@ -1,7 +1,18 @@
 /* SVG Map */
 .region-map {
+    display: block;
     width: 100%;
     height: auto;
+}
+
+.region-map-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 /* Country base styles */
@@ -26,7 +37,7 @@
 
 .country.quiz-incorrect {
     fill: #e74c3c;
-    stroke: #c0392b;
+    stroke: #7e2a21;
 }
 
 /* Loading state */

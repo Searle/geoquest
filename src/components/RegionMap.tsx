@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, memo, useRef } from 'react';
-import { geoPath, geoNaturalEarth1 } from 'd3-geo';
+import { useState, useEffect, useMemo, memo, useRef, useCallback } from 'react';
+import { geoPath, geoNaturalEarth1, geoMercatorRaw, geoMercator } from 'd3-geo';
 import clsx from 'clsx';
 
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
@@ -22,6 +22,7 @@ interface RegionMapProps {
     getCountryHighlight: (country: CountryData) => 'correct' | 'incorrect' | 'hovered' | null;
     onCountriesLoaded: (countries: CountryData[]) => void;
     isAnsweredCorrectly: (country: CountryData) => boolean;
+    incorrectCountry?: CountryData | null;
 }
 
 interface CountryProps {
@@ -34,7 +35,7 @@ interface CountryProps {
     highlightState: 'correct' | 'incorrect' | 'hovered' | null;
 }
 
-const DEBUG_COUNTRY_MEMO = false;
+const DEBUG_COUNTRY_MEMO = true;
 
 /**
  * Memoized Country component - only re-renders when its props change
@@ -149,9 +150,11 @@ const RegionMap = ({
     getCountryHighlight,
     onCountriesLoaded,
     isAnsweredCorrectly,
+    incorrectCountry,
 }: RegionMapProps) => {
     const [countries, setCountries] = useState<CountryGeoData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [hoveredCountry, setHoveredCountry] = useState<CountryData | null>(null);
 
     useEffect(() => {
         const loadCountryData = async () => {
@@ -201,7 +204,7 @@ const RegionMap = ({
             features: allFeatures,
         };
 
-        const projection = geoNaturalEarth1()
+        const projection = geoMercator()
             .fitSize([1000, 1000], featureCollection)
             .preclip((stream) => stream); // Disable antimeridian clipping
 
@@ -219,72 +222,113 @@ const RegionMap = ({
         };
     }, [countries]);
 
-    if (loading) {
-        return <div className='loading'>Loading map data...</div>;
-    }
-
     // Split countries into answered and unanswered groups
     const answeredCountries = countries.filter(({ country }) => isAnsweredCorrectly?.(country));
     const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly?.(country));
 
-    // Sort function for countries
+    // Wrapper handlers to track hover state locally
+    const handleCountryHoverInternal = useCallback(
+        (country: CountryData, event: React.MouseEvent<SVGPathElement>) => {
+            if (!isAnsweredCorrectly?.(country)) {
+                setHoveredCountry(country);
+            }
+            onCountryHover?.(country, event);
+        },
+        [onCountryHover],
+    );
+
+    const handleCountryLeaveInternal = useCallback(() => {
+        setHoveredCountry(null);
+        onCountryLeave?.();
+    }, [onCountryLeave]);
+
+    if (loading) {
+        return <div className='loading'>Loading map data...</div>;
+    }
+
+    // Sort function for countries - simple sort by area
     const sortCountries = (a: CountryGeoData, b: CountryGeoData) => {
-        const aHighlight = getCountryHighlight?.(a.country);
-        const bHighlight = getCountryHighlight?.(b.country);
-
-        // Hovered and incorrect countries always drawn last (on top)
-        const aOnTop = aHighlight === 'hovered' || aHighlight === 'incorrect';
-        const bOnTop = bHighlight === 'hovered' || bHighlight === 'incorrect';
-        if (aOnTop && !bOnTop) return 1;
-        if (bOnTop && !aOnTop) return -1;
-
-        // Within same category, largest first
+        // Largest countries first (drawn behind)
         return b.country.area - a.country.area;
     };
 
+    // Get highlight state for main SVG (only 'correct', hovered/incorrect in overlay)
+    const getMainHighlight = (country: CountryData): 'correct' | null => {
+        const highlight = getCountryHighlight?.(country);
+        return highlight === 'correct' ? 'correct' : null;
+    };
+
+    // Determine which country to show in overlay (hovered or incorrect)
+    const overlayCountry = hoveredCountry || incorrectCountry;
+    const overlayHighlight = hoveredCountry ? 'hovered' : 'incorrect';
+    const overlayCountryData = overlayCountry ? countries.find((c) => c.country.cca3 === overlayCountry.cca3) : null;
+
     return (
-        <svg
-            viewBox={`${viewBox.x0} ${viewBox.y0} ${viewBox.width} ${viewBox.height}`}
-            className='region-map'
-            xmlns='http://www.w3.org/2000/svg'
-        >
-            {/* Shadow filter definition */}
-            <defs>
-                <filter id='unanswered-shadow' x='-50%' y='-50%' width='200%' height='200%'>
-                    <feDropShadow dx='0' dy='0' stdDeviation='1' floodOpacity='0.5' />
-                </filter>
-            </defs>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {/* Main SVG - semi-static, only updates on quiz state changes */}
+            <svg
+                viewBox={`${viewBox.x0} ${viewBox.y0} ${viewBox.width} ${viewBox.height}`}
+                className='region-map'
+                xmlns='http://www.w3.org/2000/svg'
+            >
+                {/* Shadow filter definition */}
+                <defs>
+                    <filter id='unanswered-shadow' x='-50%' y='-50%' width='200%' height='200%'>
+                        <feDropShadow dx='0' dy='0' stdDeviation='1' floodOpacity='0.5' />
+                    </filter>
+                </defs>
 
-            {/* Answered countries (no shadow) */}
-            {answeredCountries.sort(sortCountries).map(({ country, feature }) => (
-                <Country
-                    key={country.cca3}
-                    country={country}
-                    feature={feature}
-                    pathGenerator={pathGenerator}
-                    onCountryClick={onCountryClick}
-                    onCountryHover={onCountryHover}
-                    onCountryLeave={onCountryLeave}
-                    highlightState={getCountryHighlight?.(country) ?? null}
-                />
-            ))}
-
-            {/* Unanswered countries (with shadow) */}
-            <g filter='url(#unanswered-shadow)'>
-                {unansweredCountries.sort(sortCountries).map(({ country, feature }) => (
+                {/* Answered countries (no shadow) */}
+                {answeredCountries.sort(sortCountries).map(({ country, feature }) => (
                     <Country
                         key={country.cca3}
                         country={country}
                         feature={feature}
                         pathGenerator={pathGenerator}
                         onCountryClick={onCountryClick}
-                        onCountryHover={onCountryHover}
-                        onCountryLeave={onCountryLeave}
-                        highlightState={getCountryHighlight?.(country) ?? null}
+                        onCountryHover={handleCountryHoverInternal}
+                        onCountryLeave={handleCountryLeaveInternal}
+                        highlightState={getMainHighlight(country)}
                     />
                 ))}
-            </g>
-        </svg>
+
+                {/* Unanswered countries (with shadow) */}
+                <g filter='url(#unanswered-shadow)'>
+                    {unansweredCountries.sort(sortCountries).map(({ country, feature }) => (
+                        <Country
+                            key={country.cca3}
+                            country={country}
+                            feature={feature}
+                            pathGenerator={pathGenerator}
+                            onCountryClick={onCountryClick}
+                            onCountryHover={handleCountryHoverInternal}
+                            onCountryLeave={handleCountryLeaveInternal}
+                            highlightState={getMainHighlight(country)}
+                        />
+                    ))}
+                </g>
+            </svg>
+
+            {/* Overlay - renders hovered or incorrect country on top */}
+            {overlayCountryData && (
+                <svg
+                    viewBox={`${viewBox.x0} ${viewBox.y0} ${viewBox.width} ${viewBox.height}`}
+                    className='region-map-overlay'
+                    xmlns='http://www.w3.org/2000/svg'
+                >
+                    <Country
+                        key={overlayCountryData.country.cca3}
+                        country={overlayCountryData.country}
+                        feature={overlayCountryData.feature}
+                        pathGenerator={pathGenerator}
+                        onCountryClick={onCountryClick}
+                        onCountryHover={handleCountryHoverInternal}
+                        onCountryLeave={handleCountryLeaveInternal}
+                        highlightState={overlayHighlight}
+                    />
+                </svg>
+            )}
+        </div>
     );
 };
 

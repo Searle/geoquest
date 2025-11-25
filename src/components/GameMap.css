@@ -2,7 +2,7 @@
 .region-map-container {
     position: relative;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     max-height: 100vh;
@@ -170,7 +170,8 @@
 /* Incorrect country label */
 .incorrect-country-label {
     position: fixed;
-    background-color: rgba(231, 76, 60, 0.95);
+    background-color: rgba(231, 76, 60, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 6px;

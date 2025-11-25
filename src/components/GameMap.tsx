@@ -201,6 +201,7 @@ const GameMap = () => {
                     getCountryHighlight={getCountryHighlight}
                     onCountriesLoaded={handleCountriesLoaded}
                     isAnsweredCorrectly={isAnsweredCorrectly}
+                    incorrectCountry={clickedCountry}
                 />
             </div>
 
