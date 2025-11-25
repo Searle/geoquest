@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { geoPath, geoMercator, geoBounds } from 'd3-geo';
+import { geoPath, geoMercator, geoBounds, type GeoStream } from 'd3-geo';
 
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 import { getCountriesByRegion, type CountryData } from '../utils/countryData.js';
@@ -7,6 +7,31 @@ import type { Region } from '../types/countries-json.js';
 import { Country } from './Country.js';
 
 import './RegionMap.css';
+
+function preclipEurope(stream: GeoStream): GeoStream {
+    return {
+        point(x, y, z) {
+            if (x <= -0.3) {
+                stream.point(x, y, z);
+            }
+        },
+        lineStart() {
+            stream.lineStart();
+        },
+        lineEnd() {
+            stream.lineEnd();
+        },
+        polygonStart() {
+            stream.polygonStart();
+        },
+        polygonEnd() {
+            stream.polygonEnd();
+        },
+        sphere() {
+            stream.sphere?.();
+        },
+    };
+}
 
 interface CountryGeoData {
     country: CountryData;
@@ -87,6 +112,9 @@ const RegionMap = ({
             features: allFeatures,
         };
 
+        // By default, disable antimeridian clipping, as it somehow destroys the output
+        let preclip: (stream: GeoStream) => GeoStream = (stream) => stream;
+
         // Calculate rotation to center the region and avoid antimeridian splits
         const rotation = [0, 0] as [number, number];
         if (region === 'Americas') {
@@ -94,6 +122,7 @@ const RegionMap = ({
         }
         if (region === 'Europe') {
             rotation[0] = -90;
+            preclip = preclipEurope;
         }
         if (region === 'Oceania') {
             rotation[0] = -90;
@@ -101,12 +130,10 @@ const RegionMap = ({
         if (region === 'Antarctic') {
             rotation[1] = 100;
         }
-        console.log(rotation);
-        const projection = geoMercator()
+        const projection = geoMercator() // Project
             .rotate(rotation)
             .fitSize([1000, 1000], featureCollection)
-            .preclip((stream) => stream); // Disable antimeridian clipping
-
+            .preclip(preclip);
         const pathGen = geoPath().projection(projection);
 
         // Calculate actual bounds of the projected features
