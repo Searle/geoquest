@@ -21,11 +21,18 @@ interface ClickPosition {
     y: number;
 }
 
-const GameMap = ({ region }: { region: Region }) => {
+const regions = ['Americas', 'Asia', 'Africa', 'Europe', 'Oceania', 'Antarctic'];
+
+const GameMap = () => {
+    const [region, setRegion] = useState<Region>('Africa');
     const [gameMode, setGameMode] = useState<GameMode>('discover');
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
     const [countries, setCountries] = useState<CountryData[]>([]);
     const [clickPosition, setClickPosition] = useState<ClickPosition | null>(null);
+
+    const handleRegionChange = (region: string) => {
+        setRegion(region as Region);
+    };
 
     const quiz = useQuiz(countries);
 
@@ -95,7 +102,7 @@ const GameMap = ({ region }: { region: Region }) => {
                 quiz.quizState?.feedback === 'incorrect';
             if (isClickedWrong) return 'incorrect';
         }
-        if (gameMode === 'discover' && hoverInfo?.country === country) return 'hovered';
+        if (hoverInfo?.country === country) return 'hovered';
 
         return null;
     };
@@ -112,37 +119,53 @@ const GameMap = ({ region }: { region: Region }) => {
         <div className='region-map-container'>
             {/* Fixed header section */}
             <div className='game-header'>
-                {/* Mode selector */}
-                <div className='mode-selector'>
-                    <button
-                        className={clsx('mode-button', { active: gameMode === 'discover' })}
-                        onClick={handleStartDiscover}
-                    >
-                        Discover
-                    </button>
-                    <button
-                        className={clsx('mode-button', { active: gameMode === 'quiz' })}
-                        onClick={handleStartQuiz}
-                        disabled={countries.length === 0}
-                    >
-                        Quiz
-                    </button>
-                </div>
+                {gameMode !== 'quiz' && (
+                    <div className='game-header-item'>
+                        <select
+                            className='mode-select'
+                            value={region}
+                            onChange={(e) => handleRegionChange(e.target.value)}
+                        >
+                            {regions.map((r) => (
+                                <option key={r}>{r}</option>
+                            ))}
+                        </select>
+
+                        <button
+                            className={clsx('mode-button')}
+                            onClick={handleStartQuiz}
+                            disabled={countries.length === 0}
+                        >
+                            Quiz starten
+                        </button>
+                    </div>
+                )}
 
                 {/* Quiz UI */}
                 {gameMode === 'quiz' && quiz.quizState && !quiz.isCompleted && (
-                    <div className='quiz-ui'>
-                        <div className='quiz-question'>
-                            Find: <strong>{getCountryName(quiz.currentQuestion!, 'deu')}</strong>
+                    <>
+                        <div className='game-header-item'>
+                            <span className='quiz-score'>
+                                <span className='correct'>✔</span>
+                                &nbsp;
+                                {quiz.quizState.answeredCorrectly.size} / {quiz.quizState.randomizedCountries.length}
+                            </span>
+                            <span className='quiz-click-on'>Klicke:</span>
+                            <span className='quiz-question'>
+                                <strong>{getCountryName(quiz.currentQuestion!, 'deu')}</strong>
+                            </span>
                         </div>
-                        <div className='quiz-progress'>
-                            {quiz.quizState.currentIndex + 1} / {quiz.quizState.randomizedCountries.length}
+                        <div className='game-header-item'>
+                            <div className='quiz-score'>
+                                <span className='incorrect'>↻</span>
+                                &nbsp;
+                                {quiz.quizState.incorrectCount}
+                            </div>
+                            <button className={clsx('mode-button')} onClick={handleStartDiscover}>
+                                Abbrechen
+                            </button>
                         </div>
-                        <div className='quiz-score'>
-                            <span className='correct'>✓ {quiz.quizState.correctCount}</span>
-                            <span className='incorrect'>✗ {quiz.quizState.incorrectCount}</span>
-                        </div>
-                    </div>
+                    </>
                 )}
             </div>
 
@@ -153,12 +176,14 @@ const GameMap = ({ region }: { region: Region }) => {
                     <div className='quiz-completed'>
                         <h2>Quiz Completed!</h2>
                         <div className='final-score'>
-                            <div>Correct: {quiz.quizState.correctCount}</div>
+                            <div>Correct: {quiz.quizState.answeredCorrectly.size}</div>
                             <div>Incorrect: {quiz.quizState.incorrectCount}</div>
                             <div>
                                 Accuracy:{' '}
                                 {Math.round(
-                                    (quiz.quizState.correctCount / quiz.quizState.randomizedCountries.length) * 100,
+                                    (quiz.quizState.answeredCorrectly.size /
+                                        quiz.quizState.randomizedCountries.length) *
+                                        100,
                                 )}
                                 %
                             </div>

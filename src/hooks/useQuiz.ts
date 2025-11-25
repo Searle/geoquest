@@ -2,9 +2,7 @@ import { useState, useCallback } from 'react';
 import type { CountryData } from '../types/countries-json.js';
 
 interface QuizState {
-    currentIndex: number;
     randomizedCountries: CountryData[];
-    correctCount: number;
     incorrectCount: number;
     feedback: 'correct' | 'incorrect' | null;
     clickedCountry: CountryData | null; // Track which country was clicked (for incorrect answers)
@@ -42,9 +40,7 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
         if (countries.length === 0) return;
 
         setQuizState({
-            currentIndex: 0,
             randomizedCountries: shuffleArray(countries),
-            correctCount: 0,
             incorrectCount: 0,
             feedback: null,
             clickedCountry: null,
@@ -62,8 +58,8 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
 
         // Move current question to the end of the list
         const updatedCountries = [...quizState.randomizedCountries];
-        const currentQ = updatedCountries[quizState.currentIndex];
-        updatedCountries.splice(quizState.currentIndex, 1);
+        const currentQ = updatedCountries[quizState.answeredCorrectly.size];
+        updatedCountries.splice(quizState.answeredCorrectly.size, 1);
         updatedCountries.push(currentQ);
 
         setQuizState({
@@ -78,7 +74,7 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
         (country: CountryData) => {
             if (!quizState) return;
 
-            const currentQuestion = quizState.randomizedCountries[quizState.currentIndex];
+            const currentQuestion = quizState.randomizedCountries[quizState.answeredCorrectly.size];
             if (!currentQuestion) return;
 
             const isCorrect = country.cca3 === currentQuestion.cca3;
@@ -88,13 +84,11 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
                 const newAnsweredCorrectly = new Set(quizState.answeredCorrectly);
                 newAnsweredCorrectly.add(country.cca3);
 
-                const nextIndex = quizState.currentIndex + 1;
+                const nextIndex = newAnsweredCorrectly.size;
                 if (nextIndex < quizState.randomizedCountries.length) {
                     // Move to next question
                     setQuizState({
                         ...quizState,
-                        currentIndex: nextIndex,
-                        correctCount: quizState.correctCount + 1,
                         feedback: null,
                         clickedCountry: null,
                         answeredCorrectly: newAnsweredCorrectly,
@@ -103,7 +97,6 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
                     // Quiz completed
                     setQuizState({
                         ...quizState,
-                        correctCount: quizState.correctCount + 1,
                         feedback: null,
                         clickedCountry: null,
                         answeredCorrectly: newAnsweredCorrectly,
@@ -125,9 +118,9 @@ export function useQuiz(countries: CountryData[]): UseQuizReturn {
         [quizState],
     );
 
-    const currentQuestion = quizState ? quizState.randomizedCountries[quizState.currentIndex] : null;
+    const currentQuestion = quizState ? quizState.randomizedCountries[quizState.answeredCorrectly.size] : null;
 
-    const isCompleted = quizState ? quizState.currentIndex >= quizState.randomizedCountries.length : false;
+    const isCompleted = quizState ? quizState.answeredCorrectly.size >= quizState.randomizedCountries.length : false;
 
     const isCorrectCountry = useCallback(
         (country: CountryData) => {

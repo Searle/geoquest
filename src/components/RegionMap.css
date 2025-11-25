@@ -15,20 +15,18 @@
 
 .country.hovered {
     fill: #51b6fa;
-    --x-filter: brightness(1.1);
+    stroke-width: 3px;
 }
 
 /* Quiz feedback styles */
 .country.quiz-target {
     fill: #7bed9f;
     stroke: #2ed573;
-    stroke-width: 2px;
 }
 
 .country.quiz-incorrect {
     fill: #e74c3c;
     stroke: #c0392b;
-    stroke-width: 2px;
 }
 
 /* Loading state */

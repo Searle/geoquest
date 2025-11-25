@@ -6,7 +6,8 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "check": "tsc --noEmit -w"
     },
     "dependencies": {
         "@anthropic-ai/claude-code": "^2.0.11",
