@@ -102,89 +102,101 @@ const RegionMap = ({
         return <div className='loading'>Loading map data...</div>;
     }
 
+    // Split countries into answered and unanswered groups
+    const answeredCountries = countries.filter(({ country }) => isAnsweredCorrectly?.(country));
+    const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly?.(country));
+
+    // Sort function for countries
+    const sortCountries = (a: CountryGeoData, b: CountryGeoData) => {
+        const aHighlight = getCountryHighlight?.(a.country);
+        const bHighlight = getCountryHighlight?.(b.country);
+
+        // Hovered and incorrect countries always drawn last (on top)
+        const aOnTop = aHighlight === 'hovered' || aHighlight === 'incorrect';
+        const bOnTop = bHighlight === 'hovered' || bHighlight === 'incorrect';
+        if (aOnTop && !bOnTop) return 1;
+        if (bOnTop && !aOnTop) return -1;
+
+        // Within same category, largest first
+        return b.country.area - a.country.area;
+    };
+
+    const renderCountry = ({ country, feature }: CountryGeoData) => {
+        // Handle both single features and feature collections
+        const features = feature.type === 'FeatureCollection' ? feature.features : [feature];
+
+        return features.map((f: Feature<Geometry>, index: number) => {
+            // For MultiPolygon, filter out small outlier polygons
+            let filteredFeature = f;
+            if (f.geometry?.type === 'MultiPolygon') {
+                const coords = f.geometry.coordinates;
+                // Only keep polygons with more than 100 points (main landmass)
+                const filtered = coords.filter((polygon) => polygon[0].length > 100);
+                if (filtered.length > 0) {
+                    filteredFeature = {
+                        ...f,
+                        geometry: {
+                            ...f.geometry,
+                            coordinates: filtered,
+                        },
+                    };
+                }
+            }
+
+            const pathData = pathGenerator(filteredFeature);
+            if (!pathData) return null;
+
+            // Dynamic hit area size based on country area
+            // Smaller countries get larger hit areas for better UX
+            const hitAreaSize = country.area < 30000 ? 12 : country.area < 100000 ? 8 : 4;
+
+            // Get highlight state from parent
+            const highlightState = getCountryHighlight?.(country);
+
+            return (
+                <g key={`${country.cca3}-${index}`}>
+                    {/* Invisible hit area with thick stroke for edges and fill for interior */}
+                    <path
+                        d={pathData}
+                        fill='transparent'
+                        stroke='transparent'
+                        strokeWidth={hitAreaSize}
+                        vectorEffect='non-scaling-stroke'
+                        onMouseMove={(e) => onCountryHover?.(country, e)}
+                        onMouseLeave={() => onCountryLeave?.()}
+                        onClick={(e) => onCountryClick?.(country, e)}
+                    />
+                    {/* Visible path */}
+                    <path
+                        d={pathData}
+                        className={clsx('country', {
+                            hovered: highlightState === 'hovered',
+                            'quiz-target': highlightState === 'correct',
+                            'quiz-incorrect': highlightState === 'incorrect',
+                        })}
+                        data-country={country.cca3}
+                        vectorEffect='non-scaling-stroke'
+                        style={{ pointerEvents: 'none' }}
+                    />
+                </g>
+            );
+        });
+    };
+
     return (
         <svg viewBox={`${x0} ${y0} ${width} ${height}`} className='region-map' xmlns='http://www.w3.org/2000/svg'>
-            {countries
-                .sort((a, b) => {
-                    const aHighlight = getCountryHighlight?.(a.country);
-                    const bHighlight = getCountryHighlight?.(b.country);
+            {/* Shadow filter definition */}
+            <defs>
+                <filter id='unanswered-shadow' x='-50%' y='-50%' width='200%' height='200%'>
+                    <feDropShadow dx='0' dy='0' stdDeviation='1' floodOpacity='0.5' />
+                </filter>
+            </defs>
 
-                    // Hovered country always drawn last (on top)
-                    if (aHighlight === 'hovered' && bHighlight !== 'hovered') return 1;
-                    if (bHighlight === 'hovered' && aHighlight !== 'hovered') return -1;
+            {/* Answered countries (no shadow) */}
+            {answeredCountries.sort(sortCountries).map(renderCountry)}
 
-                    // Draw answered countries first (behind unanswered ones)
-                    if (isAnsweredCorrectly) {
-                        const aAnswered = isAnsweredCorrectly(a.country);
-                        const bAnswered = isAnsweredCorrectly(b.country);
-                        if (aAnswered && !bAnswered) return -1;
-                        if (!aAnswered && bAnswered) return 1;
-                    }
-
-                    // Within same category, largest first
-                    return b.country.area - a.country.area;
-                })
-                .map(({ country, feature }) => {
-                    // Handle both single features and feature collections
-                    const features = feature.type === 'FeatureCollection' ? feature.features : [feature];
-
-                    return features.map((f: Feature<Geometry>, index: number) => {
-                        // For MultiPolygon, filter out small outlier polygons
-                        let filteredFeature = f;
-                        if (f.geometry?.type === 'MultiPolygon') {
-                            const coords = f.geometry.coordinates;
-                            // Only keep polygons with more than 100 points (main landmass)
-                            const filtered = coords.filter((polygon) => polygon[0].length > 100);
-                            if (filtered.length > 0) {
-                                filteredFeature = {
-                                    ...f,
-                                    geometry: {
-                                        ...f.geometry,
-                                        coordinates: filtered,
-                                    },
-                                };
-                            }
-                        }
-
-                        const pathData = pathGenerator(filteredFeature);
-                        if (!pathData) return null;
-
-                        // Dynamic hit area size based on country area
-                        // Smaller countries get larger hit areas for better UX
-                        const hitAreaSize = country.area < 30000 ? 12 : country.area < 100000 ? 8 : 4;
-
-                        // Get highlight state from parent
-                        const highlightState = getCountryHighlight?.(country);
-
-                        return (
-                            <g key={`${country.cca3}-${index}`}>
-                                {/* Invisible hit area with thick stroke for edges and fill for interior */}
-                                <path
-                                    d={pathData}
-                                    fill='transparent'
-                                    stroke='transparent'
-                                    strokeWidth={hitAreaSize}
-                                    vectorEffect='non-scaling-stroke'
-                                    onMouseMove={(e) => onCountryHover?.(country, e)}
-                                    onMouseLeave={() => onCountryLeave?.()}
-                                    onClick={(e) => onCountryClick?.(country, e)}
-                                />
-                                {/* Visible path */}
-                                <path
-                                    d={pathData}
-                                    className={clsx('country', {
-                                        hovered: highlightState === 'hovered',
-                                        'quiz-target': highlightState === 'correct',
-                                        'quiz-incorrect': highlightState === 'incorrect',
-                                    })}
-                                    data-country={country.cca3}
-                                    vectorEffect='non-scaling-stroke'
-                                    style={{ pointerEvents: 'none' }}
-                                />
-                            </g>
-                        );
-                    });
-                })}
+            {/* Unanswered countries (with shadow) */}
+            <g filter='url(#unanswered-shadow)'>{unansweredCountries.sort(sortCountries).map(renderCountry)}</g>
         </svg>
     );
 };

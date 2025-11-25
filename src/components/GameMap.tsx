@@ -174,22 +174,12 @@ const GameMap = () => {
                 {/* Quiz completed */}
                 {gameMode === 'quiz' && quiz.isCompleted && quiz.quizState && (
                     <div className='quiz-completed'>
-                        <h2>Quiz Completed!</h2>
+                        <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
-                            <div>Correct: {quiz.quizState.answeredCorrectly.size}</div>
-                            <div>Incorrect: {quiz.quizState.incorrectCount}</div>
-                            <div>
-                                Accuracy:{' '}
-                                {Math.round(
-                                    (quiz.quizState.answeredCorrectly.size /
-                                        quiz.quizState.randomizedCountries.length) *
-                                        100,
-                                )}
-                                %
-                            </div>
+                            <div>Fehlversuche: {quiz.quizState.incorrectCount}</div>
                         </div>
                         <button className='mode-button' onClick={handleStartQuiz}>
-                            Try Again
+                            Nochmal starten
                         </button>
                     </div>
                 )}
