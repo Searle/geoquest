@@ -1,5 +1,6 @@
 import type { Feature, FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
 import type { GeoPath } from 'd3-geo';
+
 import type { CountryData } from './countryData.js';
 
 interface PolygonInfo {

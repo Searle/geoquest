@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { geoPath, geoMercator, type GeoStream } from 'd3-geo';
 import type { Feature, FeatureCollection } from 'geojson';
+
 import type { Region } from '../types/countries-json.js';
 
 function preclipEurope(stream: GeoStream): GeoStream {

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import clsx from 'clsx';
-
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+
 import { getCountriesByRegion, type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
 import { useZoomableZones } from '../hooks/useZoomableZones.js';

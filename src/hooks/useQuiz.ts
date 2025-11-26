@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+
 import type { CountryData } from '../types/countries-json.js';
 
 interface QuizState {

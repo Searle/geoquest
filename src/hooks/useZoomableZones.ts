@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import type { GeoPath } from 'd3-geo';
 import type { Feature, FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
+
 import type { CountryData } from '../utils/countryData.js';
 import { calculateZoomableZones, type ZoomableZone } from '../utils/zoomableZones.js';
 

@@ -1,4 +1,5 @@
 import countriesData from '../../data/countries/countries.json' with { type: 'json' };
+
 import type { CountryData, Region } from '../types/countries-json.js';
 
 export const getAllCountries = (): CountryData[] => {
