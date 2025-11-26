@@ -107,10 +107,8 @@ export const Country = memo<CountryProps>(
                             {!forOverlay && hitAreaSize > 0 && (
                                 <path
                                     d={pathData}
-                                    fill='transparent'
-                                    stroke='transparent'
+                                    className='country-hit-area'
                                     strokeWidth={hitAreaSize}
-                                    vectorEffect='non-scaling-stroke'
                                     {...handlers}
                                 />
                             )}
@@ -121,10 +119,11 @@ export const Country = memo<CountryProps>(
                                     hovered: highlightState === 'hovered',
                                     'quiz-target': highlightState === 'correct',
                                     'quiz-incorrect': highlightState === 'incorrect',
+                                    'country-no-pointer': forOverlay || hitAreaSize > 0,
                                 })}
                                 data-country={country.cca3}
                                 vectorEffect='non-scaling-stroke'
-                                {...(forOverlay || hitAreaSize > 0 ? { style: { pointerEvents: 'none' } } : handlers)}
+                                {...(forOverlay || hitAreaSize > 0 ? {} : handlers)}
                             />
                         </g>
                     );

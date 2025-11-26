@@ -133,6 +133,8 @@
 /* Hover Tooltip */
 .country-tooltip {
     position: fixed;
+    left: var(--tooltip-x);
+    top: var(--tooltip-y);
     background-color: rgba(44, 62, 80, 0.95);
     color: white;
     padding: 0.75rem 1rem;
@@ -178,6 +180,8 @@
 /* Incorrect country label */
 .incorrect-country-label {
     position: fixed;
+    left: var(--label-x);
+    top: var(--label-y);
     background-color: rgba(231, 76, 60, 0.7);
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: white;
@@ -190,6 +194,16 @@
     transform: translateX(-50%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.2s ease;
+}
+
+.incorrect-country-label-capital {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.incorrect-country-label-country {
+    font-size: 0.8em;
+    opacity: 0.8;
 }
 
 @keyframes fadeIn {

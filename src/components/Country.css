@@ -22,3 +22,15 @@
     fill: #e74c3c;
     stroke: #7e2a21;
 }
+
+/* Hit area for small countries */
+.country-hit-area {
+    fill: transparent;
+    stroke: transparent;
+    vector-effect: non-scaling-stroke;
+}
+
+/* Disable pointer events */
+.country-no-pointer {
+    pointer-events: none;
+}

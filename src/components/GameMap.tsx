@@ -229,10 +229,12 @@ const GameMap = () => {
             {gameMode === 'discover' && hoverInfo && (
                 <div
                     className='country-tooltip'
-                    style={{
-                        left: `${hoverInfo.x + 10}px`,
-                        top: `${hoverInfo.y + 10}px`,
-                    }}
+                    style={
+                        {
+                            '--tooltip-x': `${hoverInfo.x + 10}px`,
+                            '--tooltip-y': `${hoverInfo.y + 10}px`,
+                        } as React.CSSProperties
+                    }
                 >
                     <div className='country-name'>
                         {getCountryName(hoverInfo.country, 'deu')}
@@ -251,18 +253,20 @@ const GameMap = () => {
             {gameMode !== 'discover' && clickedCountry && feedback === 'incorrect' && clickPosition && (
                 <div
                     className='incorrect-country-label'
-                    style={{
-                        left: `${clickPosition.x}px`,
-                        top:
-                            clickPosition.y > window.innerHeight * 0.9
-                                ? `${clickPosition.y - 60}px`
-                                : `${clickPosition.y + 20}px`,
-                    }}
+                    style={
+                        {
+                            '--label-x': `${clickPosition.x}px`,
+                            '--label-y':
+                                clickPosition.y > window.innerHeight * 0.9
+                                    ? `${clickPosition.y - 60}px`
+                                    : `${clickPosition.y + 20}px`,
+                        } as React.CSSProperties
+                    }
                 >
                     {gameMode === 'capital' ? (
                         <>
-                            <div style={{ fontSize: '1em', fontWeight: 'bold' }}>{getCapital(clickedCountry)}</div>
-                            <div style={{ fontSize: '0.8em', opacity: 0.8 }}>
+                            <div className='incorrect-country-label-capital'>{getCapital(clickedCountry)}</div>
+                            <div className='incorrect-country-label-country'>
                                 {getCountryName(clickedCountry, 'deu')}
                             </div>
                         </>
