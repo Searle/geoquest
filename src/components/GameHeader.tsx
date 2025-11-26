@@ -30,74 +30,71 @@ export const GameHeader = ({
     value,
     onRegionChange,
     onSetGameMode,
-}: GameHeaderProps) => {
-    return (
-        <div className='game-header'>
-            {/* Discover Mode Header */}
-            {gameMode === 'discover' && (
-                <>
-                    <div className='game-header-item'>
-                        <select
-                            className='mode-select'
-                            value={region}
-                            onChange={(e) => onRegionChange(e.target.value as unknown as Region)}
-                        >
-                            {regions.map((r) => (
-                                <option key={r}>{r}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className='game-header-item'>
-                        <span>Spiel starten:</span>
+}: GameHeaderProps) => (
+    <div className='game-header'>
+        {/* Discover Mode Header */}
+        {gameMode === 'discover' && (
+            <>
+                <div className='game-header-item'>
+                    <select
+                        className='mode-select'
+                        value={region}
+                        onChange={(e) => onRegionChange(e.target.value as unknown as Region)}
+                    >
+                        {regions.map((r) => (
+                            <option key={r}>{r}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className='game-header-item'>
+                    <span>Spiel starten:</span>
 
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={onSetGameMode['map-country']}
-                            disabled={countries.length === 0}
-                        >
-                            Länder-Karte
-                        </button>
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={onSetGameMode['map-capital']}
-                            disabled={countries.length === 0}
-                        >
-                            Hauptstadt-Karte
-                        </button>
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={onSetGameMode['choice-capital']}
-                            disabled={countries.length === 0}
-                        >
-                            Hauptstadt-Quiz
-                        </button>
+                    <button
+                        className='mode-button'
+                        onClick={onSetGameMode['map-country']}
+                        disabled={countries.length === 0}
+                    >
+                        Länder-Karte
+                    </button>
+                    <button
+                        className='mode-button'
+                        onClick={onSetGameMode['map-capital']}
+                        disabled={countries.length === 0}
+                    >
+                        Hauptstadt-Karte
+                    </button>
+                    <button
+                        className='mode-button'
+                        onClick={onSetGameMode['choice-capital']}
+                        disabled={countries.length === 0}
+                    >
+                        Hauptstadt-Quiz
+                    </button>
+                </div>
+            </>
+        )}
+        {gameMode !== 'discover' && (
+            <>
+                <div className='game-header-item'>
+                    <span className='quiz-score'>
+                        <span className='correct'>✔</span>
+                        &nbsp;
+                        {answeredCorrectly?.size ?? 0} / {randomizedCountries?.length ?? 0}
+                    </span>
+                    <span className='quiz-click-on'>{label}:</span>
+                    <span className='quiz-question'>{value}</span>
+                </div>
+                <div className='game-header-item'>
+                    <div className='quiz-score'>
+                        <span className='incorrect'>↻</span>
+                        &nbsp;
+                        {incorrectCount ?? 0}
                     </div>
-                </>
-            )}
-
-            {gameMode !== 'discover' && (
-                <>
-                    <div className='game-header-item'>
-                        <span className='quiz-score'>
-                            <span className='correct'>✔</span>
-                            &nbsp;
-                            {answeredCorrectly?.size ?? 0} / {randomizedCountries?.length ?? 0}
-                        </span>
-                        <span className='quiz-click-on'>{label}:</span>
-                        <span className='quiz-question'>{value}</span>
-                    </div>
-                    <div className='game-header-item'>
-                        <div className='quiz-score'>
-                            <span className='incorrect'>↻</span>
-                            &nbsp;
-                            {incorrectCount ?? 0}
-                        </div>
-                        <button className={clsx('mode-button')} onClick={onSetGameMode['discover']}>
-                            Abbrechen
-                        </button>
-                    </div>
-                </>
-            )}
-        </div>
-    );
-};
+                    <button className={clsx('mode-button')} onClick={onSetGameMode['discover']}>
+                        Abbrechen
+                    </button>
+                </div>
+            </>
+        )}
+    </div>
+);
