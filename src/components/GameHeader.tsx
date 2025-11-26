@@ -48,7 +48,7 @@ export const GameHeader = ({
                         </select>
                     </div>
                     <div className='game-header-item'>
-                        <span>Spiel:</span>
+                        <span>Spiel starten:</span>
 
                         <button
                             className={clsx('mode-button')}

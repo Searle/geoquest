@@ -43,11 +43,6 @@ export function calculateZoomableZones(
 
     for (const polygon of allPolygons) {
         const cca3 = polygon.country.cca3;
-
-        if (['TUN', 'GNQ'].includes(cca3)) {
-            console.log('calczoom2', cca3, polygon.area);
-        }
-
         const currentLargest = countryLargestPolygon.get(cca3) ?? 0;
         // Track the largest polygon for this country
         countryLargestPolygon.set(cca3, Math.max(currentLargest, polygon.area));
@@ -59,32 +54,13 @@ export function calculateZoomableZones(
     const smallCountryThreshold = totalMapArea * 0.001;
     const smallCountryCodes = new Set<string>();
 
-    console.log('=== Zoomable Zone Detection ===');
-    console.log('Total map area:', totalMapArea);
-    console.log('Small country threshold (0.1%):', smallCountryThreshold);
-    console.log('Country largest polygons:');
-
-    // Always log specific islands we're interested in
-    const watchList = ['REU', 'COM', 'MYT', 'MUS', 'SYC'];
-
     for (const [cca3, largestPolygonArea] of countryLargestPolygon.entries()) {
-        const country = allPolygons.find((p) => p.country.cca3 === cca3)?.country;
         const isSmall = largestPolygonArea < smallCountryThreshold;
-        const percentOfMap = ((largestPolygonArea / totalMapArea) * 100).toFixed(3);
 
         if (isSmall) {
-            console.log(
-                `  ✓ ${cca3} ${country?.name.common || cca3}: ${largestPolygonArea.toFixed(2)} (${percentOfMap}% of map) SMALL`,
-            );
             smallCountryCodes.add(cca3);
-        } else if (watchList.includes(cca3)) {
-            console.log(
-                `  ✗ ${cca3} ${country?.name.common || cca3}: ${largestPolygonArea.toFixed(2)} (${percentOfMap}% of map) TOO LARGE`,
-            );
         }
     }
-
-    console.log(`Total small countries: ${smallCountryCodes.size}`);
 
     // Filter to only include polygons from small countries
     const smallPolygons = allPolygons.filter((p) => smallCountryCodes.has(p.country.cca3));
@@ -97,10 +73,7 @@ export function calculateZoomableZones(
     // Phase 4: Find density hotspots
     const hotspots = findDensityHotspots(smallPolygons, viewBox);
 
-    console.log(`Found ${hotspots.length} density hotspots from ${smallPolygons.length} small polygons`);
-
     if (hotspots.length === 0) {
-        console.log('No hotspots found - small countries are too isolated');
         return [];
     }
 
@@ -115,13 +88,6 @@ export function calculateZoomableZones(
 
     // Phase 6: Resolve overlapping zones
     zones = resolveOverlaps(zones, viewBox);
-
-    console.log(`Created ${zones.length} zoomable zones:`);
-    zones.forEach((zone, i) => {
-        const countryNames = zone.countries.map((c) => c.name.common).join(', ');
-        console.log(`  Zone ${i + 1}: ${zone.polygons.length} polygons from [${countryNames}]`);
-    });
-    console.log('=== End Zoomable Zone Detection ===\n');
 
     return zones;
 }
@@ -175,10 +141,6 @@ function analyzePolygon(country: CountryData, geometry: Geometry, pathGenerator:
     const area = (x1 - x0) * (y1 - y0);
     const centroid: [number, number] = [(x0 + x1) / 2, (y0 + y1) / 2];
 
-    if (['TUN', 'GNQ'].includes(country.cca3)) {
-        console.log('anapol', country.cca3, area);
-    }
-
     return {
         country,
         geometry,
@@ -194,16 +156,10 @@ function analyzePolygon(country: CountryData, geometry: Geometry, pathGenerator:
 function findDensityHotspots(polygons: PolygonInfo[], viewBox: ViewBox): Array<{ center: [number, number] }> {
     const hotspots: Array<{ center: [number, number]; count: number }> = [];
     const neighborRadius = Math.min(viewBox.width, viewBox.height) * 0.15; // 15% of map size
-    const watchList = ['REU', 'COM', 'MYT', 'MUS', 'SYC'];
-
-    console.log(
-        `Neighbor detection radius: ${neighborRadius.toFixed(2)} (15% of ${Math.min(viewBox.width, viewBox.height).toFixed(2)})`,
-    );
 
     for (const polygon of polygons) {
         // Count neighbors within radius
         let neighborCount = 0;
-        const neighbors: string[] = [];
         for (const other of polygons) {
             if (polygon === other) continue;
             const distance = Math.sqrt(
@@ -212,18 +168,6 @@ function findDensityHotspots(polygons: PolygonInfo[], viewBox: ViewBox): Array<{
             );
             if (distance < neighborRadius) {
                 neighborCount++;
-                if (watchList.includes(polygon.country.cca3)) {
-                    neighbors.push(`${other.country.cca3}(${distance.toFixed(1)})`);
-                }
-            }
-        }
-
-        // Log for watched countries
-        if (watchList.includes(polygon.country.cca3)) {
-            if (neighborCount >= 1) {
-                console.log(`  ${polygon.country.cca3} has ${neighborCount} neighbors: ${neighbors.join(', ')}`);
-            } else {
-                console.log(`  ${polygon.country.cca3} is isolated (no neighbors within ${neighborRadius.toFixed(2)})`);
             }
         }
 
@@ -375,8 +319,6 @@ function clampToViewBox(
 function resolveOverlaps(zones: ZoomableZone[], viewBox: ViewBox): ZoomableZone[] {
     let changed = true;
 
-    console.log(`\nResolving overlaps among ${zones.length} zones:`);
-
     while (changed) {
         changed = false;
         const newZones: ZoomableZone[] = [];
@@ -407,10 +349,6 @@ function resolveOverlaps(zones: ZoomableZone[], viewBox: ViewBox): ZoomableZone[
 
                 // Merge if >40% of the smaller zone overlaps with the larger
                 if (overlapRatio > 0.4) {
-                    console.log(
-                        `  Merging ${zoneA.id} and ${zoneB.id} (overlap ratio: ${(overlapRatio * 100).toFixed(1)}%)`,
-                    );
-
                     // Merge zones by recalculating bounding box of all polygons
                     const mergedPolygons = [...zoneA.polygons, ...zoneB.polygons];
                     const mergedCountries = Array.from(new Set([...zoneA.countries, ...zoneB.countries]));
