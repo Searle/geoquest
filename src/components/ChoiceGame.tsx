@@ -3,18 +3,18 @@ import clsx from 'clsx';
 
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
 import { getCapitalOptions } from '../utils/capitalSelection.js';
-import type { AnswerHistoryItem } from '../hooks/useCapitalQuiz2.js';
+import type { AnswerHistoryItem } from '../hooks/useChoiceGame.js';
 
-import './CapitalQuiz2.css';
+import './ChoiceGame.css';
 
-interface CapitalQuiz2Props {
+interface ChoiceGameProps {
     currentQuestion: CountryData | null;
     answerHistory: AnswerHistoryItem[];
     countries: CountryData[];
     onAnswerSelect: (capital: string) => void;
 }
 
-export const CapitalQuiz2 = ({ currentQuestion, answerHistory, countries, onAnswerSelect }: CapitalQuiz2Props) => {
+export const ChoiceGame = ({ currentQuestion, answerHistory, countries, onAnswerSelect }: ChoiceGameProps) => {
     // Generate multiple choice options
     const capitalOptions = useMemo(() => {
         if (!currentQuestion) return [];
@@ -22,11 +22,11 @@ export const CapitalQuiz2 = ({ currentQuestion, answerHistory, countries, onAnsw
     }, [currentQuestion, countries]);
 
     if (!currentQuestion) {
-        return <div className='capital-quiz2-loading'>Wird geladen...</div>;
+        return <div className='choice-game-loading'>Wird geladen...</div>;
     }
 
     return (
-        <div className='capital-quiz2-container'>
+        <div className='choice-game-container'>
             {/* Question Area */}
             <div className='quiz-question-area'>
                 <h2 className='quiz-question-title'>Die Hauptstadt von:</h2>

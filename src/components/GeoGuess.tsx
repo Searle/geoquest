@@ -5,8 +5,9 @@ import RegionMap from './RegionMap.js';
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
 import { useMapQuiz as useMapQuiz } from '../hooks/useMapQuiz.js';
-import { useCapitalQuiz2 } from '../hooks/useCapitalQuiz2.js';
-import { CapitalQuiz2 } from './CapitalQuiz2.js';
+import { useChoiceGame as useChoiceGame } from '../hooks/useChoiceGame.js';
+import { ChoiceGame } from './ChoiceGame.js';
+import { GameHeader } from './GameHeader.js';
 
 import './GeoGuess.css';
 
@@ -36,32 +37,33 @@ const GeoGuess = () => {
         setRegion(region as Region);
     };
 
-    const quiz = useMapQuiz(countries);
-    const quiz2 = useCapitalQuiz2(countries);
+    const mapGame = useMapQuiz(countries);
+    const choiceGame = useChoiceGame(countries);
 
     // Destructure quiz values for stable dependencies
-    const { startQuiz, resetQuiz, clearFeedback, handleAnswer, isAnsweredCorrectly, clickedCountry, quizState } = quiz;
+    const { startQuiz, resetQuiz, clearFeedback, handleAnswer, isAnsweredCorrectly, clickedCountry, quizState } =
+        mapGame;
     const feedback = quizState?.feedback;
 
     // Mode switching
-    const handleStartCountryMap = () => {
+    const handleStartCountryMapGame = () => {
         startQuiz();
         setGameMode('map-country');
     };
 
-    const handleStartCapitalMap = () => {
+    const handleStartCapitalMapGame = () => {
         startQuiz();
         setGameMode('map-capital');
     };
 
-    const handleStartCapitalQuiz2 = () => {
-        quiz2.startQuiz();
+    const handleStartCapitalChoiceGame = () => {
+        choiceGame.startQuiz();
         setGameMode('capital2');
     };
 
     const handleStartDiscover = () => {
         resetQuiz();
-        quiz2.resetQuiz();
+        choiceGame.resetQuiz();
         setGameMode('discover');
     };
 
@@ -139,108 +141,27 @@ const GeoGuess = () => {
 
     return (
         <div className='geo-guess'>
-            {/* Fixed header section */}
-            <div className='game-header'>
-                {gameMode === 'discover' && (
-                    <>
-                        <div className='game-header-item'>
-                            <select
-                                className='mode-select'
-                                value={region}
-                                onChange={(e) => handleRegionChange(e.target.value)}
-                            >
-                                {regions.map((r) => (
-                                    <option key={r}>{r}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className='game-header-item'>
-                            <span>Spiel:</span>
-
-                            <button
-                                className={clsx('mode-button')}
-                                onClick={handleStartCountryMap}
-                                disabled={countries.length === 0}
-                            >
-                                Länder-Karte
-                            </button>
-                            <button
-                                className={clsx('mode-button')}
-                                onClick={handleStartCapitalMap}
-                                disabled={countries.length === 0}
-                            >
-                                Hauptstadt-Karte
-                            </button>
-                            <button
-                                className={clsx('mode-button')}
-                                onClick={handleStartCapitalQuiz2}
-                                disabled={countries.length === 0}
-                            >
-                                Hauptstadt-Quiz
-                            </button>
-                        </div>
-                    </>
-                )}
-
-                {/* Quiz UI - Map Quizzes */}
-                {(gameMode === 'map-country' || gameMode === 'map-capital') && quizState && !quiz.isCompleted && (
-                    <>
-                        <div className='game-header-item'>
-                            <span className='quiz-score'>
-                                <span className='correct'>✔</span>
-                                &nbsp;
-                                {quizState.answeredCorrectly.size} / {quizState.randomizedCountries.length}
-                            </span>
-                            <span className='quiz-click-on'>Klicke:</span>
-                            <span className='quiz-question'>
-                                <strong>
-                                    {gameMode === 'map-capital'
-                                        ? getCapital(quiz.currentQuestion!)
-                                        : getCountryName(quiz.currentQuestion!, 'deu')}
-                                </strong>
-                            </span>
-                        </div>
-                        <div className='game-header-item'>
-                            <div className='quiz-score'>
-                                <span className='incorrect'>↻</span>
-                                &nbsp;
-                                {quizState.incorrectCount}
-                            </div>
-                            <button className={clsx('mode-button')} onClick={handleStartDiscover}>
-                                Abbrechen
-                            </button>
-                        </div>
-                    </>
-                )}
-
-                {/* Quiz UI - Capital Quiz 2 */}
-                {gameMode === 'capital2' && quiz2.quizState && !quiz2.isCompleted && (
-                    <>
-                        <div className='game-header-item'>
-                            <span className='quiz-score'>
-                                <span className='correct'>✔</span>
-                                &nbsp;
-                                {quiz2.quizState.answeredCorrectly.size} / {quiz2.quizState.randomizedCountries.length}
-                            </span>
-                        </div>
-                        <div className='game-header-item'>
-                            <div className='quiz-score'>
-                                <span className='incorrect'>↻</span>
-                                &nbsp;
-                                {quiz2.quizState.incorrectCount}
-                            </div>
-                            <button className={clsx('mode-button')} onClick={handleStartDiscover}>
-                                Abbrechen
-                            </button>
-                        </div>
-                    </>
-                )}
-            </div>
+            <GameHeader
+                gameMode={gameMode}
+                region={region}
+                regions={regions}
+                countries={countries}
+                mapQuizState={quizState}
+                mapQuizCompleted={mapGame.isCompleted}
+                mapCurrentQuestion={mapGame.currentQuestion}
+                choiceGameState={choiceGame.quizState}
+                choiceGameCompleted={choiceGame.isCompleted}
+                onRegionChange={handleRegionChange}
+                onStartCountryMapGame={handleStartCountryMapGame}
+                onStartCapitalMapGame={handleStartCapitalMapGame}
+                onStartCapitalChoiceGame={handleStartCapitalChoiceGame}
+                onStartDiscover={handleStartDiscover}
+            />
 
             {/* Scrollable content section */}
             <div className='game-content'>
                 {/* Quiz completed - Map Quizzes */}
-                {(gameMode === 'map-country' || gameMode === 'map-capital') && quiz.isCompleted && quizState && (
+                {(gameMode === 'map-country' || gameMode === 'map-capital') && mapGame.isCompleted && quizState && (
                     <div className='quiz-completed'>
                         <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
@@ -248,7 +169,7 @@ const GeoGuess = () => {
                         </div>
                         <button
                             className='mode-button'
-                            onClick={gameMode === 'map-capital' ? handleStartCapitalMap : handleStartCountryMap}
+                            onClick={gameMode === 'map-capital' ? handleStartCapitalMapGame : handleStartCountryMapGame}
                         >
                             Nochmal starten
                         </button>
@@ -256,25 +177,25 @@ const GeoGuess = () => {
                 )}
 
                 {/* Quiz completed - Capital Quiz 2 */}
-                {gameMode === 'capital2' && quiz2.isCompleted && quiz2.quizState && (
+                {gameMode === 'capital2' && choiceGame.isCompleted && choiceGame.quizState && (
                     <div className='quiz-completed'>
                         <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
-                            <div>Fehlversuche: {quiz2.quizState.incorrectCount}</div>
+                            <div>Fehlversuche: {choiceGame.quizState.incorrectCount}</div>
                         </div>
-                        <button className='mode-button' onClick={handleStartCapitalQuiz2}>
+                        <button className='mode-button' onClick={handleStartCapitalChoiceGame}>
                             Nochmal starten
                         </button>
                     </div>
                 )}
 
                 {/* Capital Quiz 2 Component */}
-                {gameMode === 'capital2' && !quiz2.isCompleted && quiz2.currentQuestion && (
-                    <CapitalQuiz2
-                        currentQuestion={quiz2.currentQuestion}
-                        answerHistory={quiz2.quizState?.answerHistory ?? []}
+                {gameMode === 'capital2' && !choiceGame.isCompleted && choiceGame.currentQuestion && (
+                    <ChoiceGame
+                        currentQuestion={choiceGame.currentQuestion}
+                        answerHistory={choiceGame.quizState?.answerHistory ?? []}
                         countries={countries}
-                        onAnswerSelect={quiz2.handleAnswer}
+                        onAnswerSelect={choiceGame.handleAnswer}
                     />
                 )}
 

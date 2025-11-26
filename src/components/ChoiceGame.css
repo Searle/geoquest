@@ -1,5 +1,5 @@
 /* Capital Quiz 2 - Multiple Choice Quiz */
-.capital-quiz2-container {
+.choice-game-container {
     display: flex;
     gap: 2rem;
     padding: 2rem;
@@ -7,7 +7,7 @@
     overflow: hidden;
 }
 
-.capital-quiz2-loading {
+.choice-game-loading {
     display: flex;
     justify-content: center;
     align-items: center;

@@ -15,7 +15,7 @@ interface QuizState {
     answerHistory: AnswerHistoryItem[];
 }
 
-export function useCapitalQuiz2(countries: CountryData[]) {
+export function useChoiceGame(countries: CountryData[]) {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
     const startQuiz = useCallback(() => {
