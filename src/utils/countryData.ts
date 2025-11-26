@@ -14,10 +14,10 @@ export const getCountryByCca3 = (cca3: string): CountryData | undefined =>
     getAllCountries().find((country) => country.cca3 === cca3);
 
 // Get the path to a country's GeoJSON file
-export const getCountryGeoJsonPath = (cca3: string): string => `/data/countries/data/${cca3.toLowerCase()}.geo.json`;
+export const getCountryGeoJsonPath = (cca3: string): string => `data/countries/data/${cca3.toLowerCase()}.geo.json`;
 
 // Get the path to a country's SVG flag
-export const getCountryFlagPath = (cca3: string): string => `/data/countries/data/${cca3.toLowerCase()}.svg`;
+export const getCountryFlagPath = (cca3: string): string => `data/countries/data/${cca3.toLowerCase()}.svg`;
 
 // Get country name in a specific language
 export const getCountryName = (country: CountryData, language: string = 'deu'): string => {

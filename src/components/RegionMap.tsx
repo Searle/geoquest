@@ -71,7 +71,7 @@ const RegionMap = ({
             // Load GeoJSON for each country
             const countryDataPromises = regionCountries.map(async (country) => {
                 try {
-                    const response = await fetch(`/data/countries/data/${country.cca3.toLowerCase()}.geo.json`);
+                    const response = await fetch(`data/countries/data/${country.cca3.toLowerCase()}.geo.json`);
                     if (!response.ok) {
                         console.warn(`Failed to load GeoJSON for ${country.name.common}`);
                         return null;
