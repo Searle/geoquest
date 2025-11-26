@@ -4,13 +4,13 @@ import clsx from 'clsx';
 import RegionMap from './RegionMap.js';
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
-import { useQuiz } from '../hooks/useQuiz.js';
+import { useMapQuiz as useMapQuiz } from '../hooks/useMapQuiz.js';
 import { useCapitalQuiz2 } from '../hooks/useCapitalQuiz2.js';
 import { CapitalQuiz2 } from './CapitalQuiz2.js';
 
-import './GameMap.css';
+import './GeoGuess.css';
 
-type GameMode = 'discover' | 'country' | 'capital' | 'capital2';
+type GameMode = 'discover' | 'map-country' | 'map-capital' | 'capital2';
 
 interface HoverInfo {
     country: CountryData;
@@ -25,7 +25,7 @@ interface ClickPosition {
 
 const regions = ['Americas', 'Asia', 'Africa', 'Europe', 'Oceania', 'Antarctic'];
 
-const GameMap = () => {
+const GeoGuess = () => {
     const [region, setRegion] = useState<Region>('Africa');
     const [gameMode, setGameMode] = useState<GameMode>('discover');
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
@@ -36,7 +36,7 @@ const GameMap = () => {
         setRegion(region as Region);
     };
 
-    const quiz = useQuiz(countries);
+    const quiz = useMapQuiz(countries);
     const quiz2 = useCapitalQuiz2(countries);
 
     // Destructure quiz values for stable dependencies
@@ -44,14 +44,14 @@ const GameMap = () => {
     const feedback = quizState?.feedback;
 
     // Mode switching
-    const handleStartCountryQuiz = () => {
+    const handleStartCountryMap = () => {
         startQuiz();
-        setGameMode('country');
+        setGameMode('map-country');
     };
 
-    const handleStartCapitalQuiz = () => {
+    const handleStartCapitalMap = () => {
         startQuiz();
-        setGameMode('capital');
+        setGameMode('map-capital');
     };
 
     const handleStartCapitalQuiz2 = () => {
@@ -67,7 +67,7 @@ const GameMap = () => {
 
     // Dismiss incorrect feedback on any click
     const handleDismissIncorrect = () => {
-        if ((gameMode === 'country' || gameMode === 'capital') && feedback === 'incorrect') {
+        if ((gameMode === 'map-country' || gameMode === 'map-capital') && feedback === 'incorrect') {
             clearFeedback();
             setClickPosition(null);
         }
@@ -76,7 +76,7 @@ const GameMap = () => {
     // Country interaction handlers
     const handleCountryClick = useCallback(
         (country: CountryData, event?: React.MouseEvent) => {
-            if (gameMode === 'country' || gameMode === 'capital') {
+            if (gameMode === 'map-country' || gameMode === 'map-capital') {
                 // Don't allow clicking on already correctly answered countries
                 if (isAnsweredCorrectly(country)) {
                     return;
@@ -112,7 +112,7 @@ const GameMap = () => {
     // Determine country highlight state
     const getCountryHighlight = useCallback(
         (country: CountryData): 'correct' | 'incorrect' | 'hovered' | null => {
-            if (gameMode === 'country' || gameMode === 'capital') {
+            if (gameMode === 'map-country' || gameMode === 'map-capital') {
                 // Quiz mode
                 // Show all correctly answered countries in green
                 if (isAnsweredCorrectly(country)) return 'correct';
@@ -138,47 +138,52 @@ const GameMap = () => {
     );
 
     return (
-        <div className='region-map-container'>
+        <div className='geo-guess'>
             {/* Fixed header section */}
             <div className='game-header'>
                 {gameMode === 'discover' && (
-                    <div className='game-header-item'>
-                        <select
-                            className='mode-select'
-                            value={region}
-                            onChange={(e) => handleRegionChange(e.target.value)}
-                        >
-                            {regions.map((r) => (
-                                <option key={r}>{r}</option>
-                            ))}
-                        </select>
+                    <>
+                        <div className='game-header-item'>
+                            <select
+                                className='mode-select'
+                                value={region}
+                                onChange={(e) => handleRegionChange(e.target.value)}
+                            >
+                                {regions.map((r) => (
+                                    <option key={r}>{r}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className='game-header-item'>
+                            <span>Spiel:</span>
 
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={handleStartCountryQuiz}
-                            disabled={countries.length === 0}
-                        >
-                            Länder-Quiz starten
-                        </button>
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={handleStartCapitalQuiz}
-                            disabled={countries.length === 0}
-                        >
-                            Hauptstadt-Quiz starten
-                        </button>
-                        <button
-                            className={clsx('mode-button')}
-                            onClick={handleStartCapitalQuiz2}
-                            disabled={countries.length === 0}
-                        >
-                            Hauptstadt-Quiz2
-                        </button>
-                    </div>
+                            <button
+                                className={clsx('mode-button')}
+                                onClick={handleStartCountryMap}
+                                disabled={countries.length === 0}
+                            >
+                                Länder-Karte
+                            </button>
+                            <button
+                                className={clsx('mode-button')}
+                                onClick={handleStartCapitalMap}
+                                disabled={countries.length === 0}
+                            >
+                                Hauptstadt-Karte
+                            </button>
+                            <button
+                                className={clsx('mode-button')}
+                                onClick={handleStartCapitalQuiz2}
+                                disabled={countries.length === 0}
+                            >
+                                Hauptstadt-Quiz
+                            </button>
+                        </div>
+                    </>
                 )}
 
                 {/* Quiz UI - Map Quizzes */}
-                {(gameMode === 'country' || gameMode === 'capital') && quizState && !quiz.isCompleted && (
+                {(gameMode === 'map-country' || gameMode === 'map-capital') && quizState && !quiz.isCompleted && (
                     <>
                         <div className='game-header-item'>
                             <span className='quiz-score'>
@@ -189,7 +194,7 @@ const GameMap = () => {
                             <span className='quiz-click-on'>Klicke:</span>
                             <span className='quiz-question'>
                                 <strong>
-                                    {gameMode === 'capital'
+                                    {gameMode === 'map-capital'
                                         ? getCapital(quiz.currentQuestion!)
                                         : getCountryName(quiz.currentQuestion!, 'deu')}
                                 </strong>
@@ -235,7 +240,7 @@ const GameMap = () => {
             {/* Scrollable content section */}
             <div className='game-content'>
                 {/* Quiz completed - Map Quizzes */}
-                {(gameMode === 'country' || gameMode === 'capital') && quiz.isCompleted && quizState && (
+                {(gameMode === 'map-country' || gameMode === 'map-capital') && quiz.isCompleted && quizState && (
                     <div className='quiz-completed'>
                         <h2>Yay, geschafft!</h2>
                         <div className='final-score'>
@@ -243,7 +248,7 @@ const GameMap = () => {
                         </div>
                         <button
                             className='mode-button'
-                            onClick={gameMode === 'capital' ? handleStartCapitalQuiz : handleStartCountryQuiz}
+                            onClick={gameMode === 'map-capital' ? handleStartCapitalMap : handleStartCountryMap}
                         >
                             Nochmal starten
                         </button>
@@ -274,7 +279,7 @@ const GameMap = () => {
                 )}
 
                 {/* Map component */}
-                {(gameMode === 'discover' || gameMode === 'country' || gameMode === 'capital') && (
+                {(gameMode === 'discover' || gameMode === 'map-country' || gameMode === 'map-capital') && (
                     <RegionMap
                         region={region}
                         onCountryClick={handleCountryClick}
@@ -309,12 +314,12 @@ const GameMap = () => {
             )}
 
             {/* Click-anywhere overlay to dismiss incorrect feedback */}
-            {(gameMode === 'country' || gameMode === 'capital') && feedback === 'incorrect' && (
+            {(gameMode === 'map-country' || gameMode === 'map-capital') && feedback === 'incorrect' && (
                 <div className='dismiss-overlay' onClick={handleDismissIncorrect} />
             )}
 
             {/* Incorrect country label (quiz mode) */}
-            {(gameMode === 'country' || gameMode === 'capital') &&
+            {(gameMode === 'map-country' || gameMode === 'map-capital') &&
                 clickedCountry &&
                 feedback === 'incorrect' &&
                 clickPosition && (
@@ -330,7 +335,7 @@ const GameMap = () => {
                             } as React.CSSProperties
                         }
                     >
-                        {gameMode === 'capital' ? (
+                        {gameMode === 'map-capital' ? (
                             <>
                                 <div className='incorrect-country-label-capital'>{getCapital(clickedCountry)}</div>
                                 <div className='incorrect-country-label-country'>
@@ -346,4 +351,4 @@ const GameMap = () => {
     );
 };
 
-export default GameMap;
+export default GeoGuess;

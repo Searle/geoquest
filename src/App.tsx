@@ -1,11 +1,11 @@
-import GameMap from './components/GameMap.js';
+import GeoGuess from './components/GeoGuess.js';
 
 import './App.css';
 
 function App() {
     return (
         <div className='app'>
-            <GameMap />
+            <GeoGuess />
         </div>
     );
 }
