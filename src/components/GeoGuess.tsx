@@ -6,7 +6,7 @@ import { useMapGame } from '../hooks/useMapGame.js';
 import { useChoiceGame } from '../hooks/useChoiceGame.js';
 import { ChoiceGame } from './ChoiceGame.js';
 import { MapGame } from './MapGame.js';
-import type { GameMode } from '../types/game.js';
+import type { GameMode, OnSetGameMode } from '../types/game.js';
 
 import './GeoGuess.css';
 
@@ -22,26 +22,24 @@ const GeoGuess = () => {
     const mapGame = useMapGame(countries);
     const choiceGame = useChoiceGame(countries);
 
-    // Mode switching
-    const handleStartCountryMapGame = () => {
-        mapGame.startQuiz();
-        setGameMode('map-country');
-    };
-
-    const handleStartCapitalMapGame = () => {
-        mapGame.startQuiz();
-        setGameMode('map-capital');
-    };
-
-    const handleStartCapitalChoiceGame = () => {
-        choiceGame.startQuiz();
-        setGameMode('choice-capital');
-    };
-
-    const handleStartDiscover = () => {
-        mapGame.resetQuiz();
-        choiceGame.resetQuiz();
-        setGameMode('discover');
+    const handleSetGameMode: OnSetGameMode = {
+        discover: () => {
+            mapGame.resetQuiz();
+            choiceGame.resetQuiz();
+            setGameMode('discover');
+        },
+        'map-country': () => {
+            mapGame.startQuiz();
+            setGameMode('map-country');
+        },
+        'map-capital': () => {
+            mapGame.startQuiz();
+            setGameMode('map-capital');
+        },
+        'choice-capital': () => {
+            choiceGame.startQuiz();
+            setGameMode('choice-capital');
+        },
     };
 
     // Pass countries up from MapGame
@@ -61,12 +59,8 @@ const GeoGuess = () => {
                     choiceGame={choiceGame}
                     countries={countries}
                     region={region}
-                    onRestart={handleStartCapitalChoiceGame}
                     onRegionChange={handleRegionChange}
-                    onStartCountryMapGame={handleStartCountryMapGame}
-                    onStartCapitalMapGame={handleStartCapitalMapGame}
-                    onStartCapitalChoiceGame={handleStartCapitalChoiceGame}
-                    onStartDiscover={handleStartDiscover}
+                    onSetGameMode={handleSetGameMode}
                 />
             )}
 
@@ -75,16 +69,12 @@ const GeoGuess = () => {
                 <MapGame
                     gameMode={gameMode}
                     mapGame={mapGame}
-                    region={region}
                     countries={countries}
+                    region={region}
+                    onSetGameMode={handleSetGameMode}
                     isCompleted={mapGame.isCompleted}
                     onCountriesLoaded={handleCountriesLoaded}
-                    onRestart={gameMode === 'map-capital' ? handleStartCapitalMapGame : handleStartCountryMapGame}
                     onRegionChange={handleRegionChange}
-                    onStartCountryMapGame={handleStartCountryMapGame}
-                    onStartCapitalMapGame={handleStartCapitalMapGame}
-                    onStartCapitalChoiceGame={handleStartCapitalChoiceGame}
-                    onStartDiscover={handleStartDiscover}
                 />
             )}
         </div>

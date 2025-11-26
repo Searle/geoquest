@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
+
 import RegionMap from './RegionMap.js';
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
-import { useMapGame as useMapGame, type UseMapGame } from '../hooks/useMapGame.js';
+import { type UseMapGame } from '../hooks/useMapGame.js';
 import { GameHeader } from './GameHeader.js';
+import type { GameMode, OnSetGameMode } from '../types/game.js';
 
 import './MapGame.css';
-import type { GameMode } from '../types/game.js';
 
 interface HoverInfo {
     country: CountryData;
@@ -26,13 +27,8 @@ interface MapGameProps {
     countries: CountryData[];
     isCompleted: boolean;
     onCountriesLoaded: (countries: CountryData[]) => void;
-    onRestart: () => void;
-    onRegionChange: (region: string) => void;
-    // setGameMode: (gameMode: GameMode) => void;
-    onStartCountryMapGame: () => void;
-    onStartCapitalMapGame: () => void;
-    onStartCapitalChoiceGame: () => void;
-    onStartDiscover: () => void;
+    onRegionChange: (region: Region) => void;
+    onSetGameMode: OnSetGameMode;
 }
 
 export const MapGame = ({
@@ -42,12 +38,8 @@ export const MapGame = ({
     countries,
     isCompleted,
     onCountriesLoaded,
-    onRestart,
     onRegionChange,
-    onStartCountryMapGame,
-    onStartCapitalMapGame,
-    onStartCapitalChoiceGame,
-    onStartDiscover,
+    onSetGameMode,
 }: MapGameProps) => {
     const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
     const [clickPosition, setClickPosition] = useState<ClickPosition | null>(null);
@@ -70,10 +62,7 @@ export const MapGame = ({
             label='Klicke'
             value={gameMode === 'map-capital' ? getCapital(currentQuestion) : getCountryName(currentQuestion, 'deu')}
             onRegionChange={onRegionChange}
-            onStartCountryMapGame={onStartCountryMapGame}
-            onStartCapitalMapGame={onStartCapitalMapGame}
-            onStartCapitalChoiceGame={onStartCapitalChoiceGame}
-            onStartDiscover={onStartDiscover}
+            onSetGameMode={onSetGameMode}
         />
     );
 
@@ -150,7 +139,7 @@ export const MapGame = ({
                     <div className='final-score'>
                         <div>Fehlversuche: {incorrectCount}</div>
                     </div>
-                    <button className='mode-button' onClick={onRestart}>
+                    <button className='mode-button' onClick={() => onSetGameMode[gameMode]()}>
                         Nochmal starten
                     </button>
                 </div>

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import { type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
-import { regions, type GameMode } from '../types/game.js';
+import { regions, type GameMode, type OnSetGameMode } from '../types/game.js';
 
 import './GameHeader.css';
 
@@ -15,11 +15,8 @@ interface GameHeaderProps {
     incorrectCount: number | undefined;
     label: string;
     value: string;
-    onRegionChange: (region: string) => void;
-    onStartCountryMapGame: () => void;
-    onStartCapitalMapGame: () => void;
-    onStartCapitalChoiceGame: () => void;
-    onStartDiscover: () => void;
+    onRegionChange: (region: Region) => void;
+    onSetGameMode: OnSetGameMode;
 }
 
 export const GameHeader = ({
@@ -32,10 +29,7 @@ export const GameHeader = ({
     label,
     value,
     onRegionChange,
-    onStartCountryMapGame,
-    onStartCapitalMapGame,
-    onStartCapitalChoiceGame,
-    onStartDiscover,
+    onSetGameMode,
 }: GameHeaderProps) => {
     return (
         <div className='game-header'>
@@ -43,7 +37,11 @@ export const GameHeader = ({
             {gameMode === 'discover' && (
                 <>
                     <div className='game-header-item'>
-                        <select className='mode-select' value={region} onChange={(e) => onRegionChange(e.target.value)}>
+                        <select
+                            className='mode-select'
+                            value={region}
+                            onChange={(e) => onRegionChange(e.target.value as unknown as Region)}
+                        >
                             {regions.map((r) => (
                                 <option key={r}>{r}</option>
                             ))}
@@ -54,21 +52,21 @@ export const GameHeader = ({
 
                         <button
                             className={clsx('mode-button')}
-                            onClick={onStartCountryMapGame}
+                            onClick={onSetGameMode['map-country']}
                             disabled={countries.length === 0}
                         >
                             Länder-Karte
                         </button>
                         <button
                             className={clsx('mode-button')}
-                            onClick={onStartCapitalMapGame}
+                            onClick={onSetGameMode['map-capital']}
                             disabled={countries.length === 0}
                         >
                             Hauptstadt-Karte
                         </button>
                         <button
                             className={clsx('mode-button')}
-                            onClick={onStartCapitalChoiceGame}
+                            onClick={onSetGameMode['choice-capital']}
                             disabled={countries.length === 0}
                         >
                             Hauptstadt-Quiz
@@ -94,7 +92,7 @@ export const GameHeader = ({
                             &nbsp;
                             {incorrectCount ?? 0}
                         </div>
-                        <button className={clsx('mode-button')} onClick={onStartDiscover}>
+                        <button className={clsx('mode-button')} onClick={onSetGameMode['discover']}>
                             Abbrechen
                         </button>
                     </div>
