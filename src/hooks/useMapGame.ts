@@ -10,7 +10,7 @@ interface QuizState {
     answeredCorrectly: Set<string>; // Track cca3 codes of correctly answered countries
 }
 
-interface UseMapQuizReturn {
+export interface UseMapGame {
     quizState: QuizState | null;
     currentQuestion: CountryData | null;
     clickedCountry: CountryData | null;
@@ -34,7 +34,7 @@ const shuffleArray = <T>(array: T[]): T[] => {
     return shuffled;
 };
 
-export function useMapQuiz(countries: CountryData[]): UseMapQuizReturn {
+export function useMapGame(countries: CountryData[]): UseMapGame {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
     const startQuiz = useCallback(() => {

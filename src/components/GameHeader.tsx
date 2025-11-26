@@ -1,36 +1,20 @@
 import clsx from 'clsx';
 
-import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
+import { type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
+import { regions, type GameMode } from '../types/game.js';
 
 import './GameHeader.css';
-
-type GameMode = 'discover' | 'map-country' | 'map-capital' | 'capital2';
-
-interface MapQuizState {
-    randomizedCountries: CountryData[];
-    incorrectCount: number;
-    answeredCorrectly: Set<string>;
-    feedback: 'correct' | 'incorrect' | null;
-    clickedCountry: CountryData | null;
-}
-
-interface ChoiceGameState {
-    randomizedCountries: CountryData[];
-    incorrectCount: number;
-    answeredCorrectly: Set<string>;
-}
 
 interface GameHeaderProps {
     gameMode: GameMode;
     region: Region;
-    regions: string[];
     countries: CountryData[];
-    mapQuizState: MapQuizState | null;
-    mapQuizCompleted: boolean;
-    mapCurrentQuestion: CountryData | null;
-    choiceGameState: ChoiceGameState | null;
-    choiceGameCompleted: boolean;
+    answeredCorrectly: Set<string> | undefined;
+    randomizedCountries: CountryData[] | undefined;
+    incorrectCount: number | undefined;
+    label: string;
+    value: string;
     onRegionChange: (region: string) => void;
     onStartCountryMapGame: () => void;
     onStartCapitalMapGame: () => void;
@@ -41,13 +25,12 @@ interface GameHeaderProps {
 export const GameHeader = ({
     gameMode,
     region,
-    regions,
     countries,
-    mapQuizState,
-    mapQuizCompleted,
-    mapCurrentQuestion,
-    choiceGameState,
-    choiceGameCompleted,
+    answeredCorrectly,
+    randomizedCountries,
+    incorrectCount,
+    label,
+    value,
     onRegionChange,
     onStartCountryMapGame,
     onStartCapitalMapGame,
@@ -94,52 +77,22 @@ export const GameHeader = ({
                 </>
             )}
 
-            {/* Map Quiz Header */}
-            {(gameMode === 'map-country' || gameMode === 'map-capital') && mapQuizState && !mapQuizCompleted && (
+            {gameMode !== 'discover' && (
                 <>
                     <div className='game-header-item'>
                         <span className='quiz-score'>
                             <span className='correct'>✔</span>
                             &nbsp;
-                            {mapQuizState.answeredCorrectly.size} / {mapQuizState.randomizedCountries.length}
+                            {answeredCorrectly?.size ?? 0} / {randomizedCountries?.length ?? 0}
                         </span>
-                        <span className='quiz-click-on'>Klicke:</span>
-                        <span className='quiz-question'>
-                            <strong>
-                                {gameMode === 'map-capital'
-                                    ? getCapital(mapCurrentQuestion!)
-                                    : getCountryName(mapCurrentQuestion!, 'deu')}
-                            </strong>
-                        </span>
+                        <span className='quiz-click-on'>{label}:</span>
+                        <span className='quiz-question'>{value}</span>
                     </div>
                     <div className='game-header-item'>
                         <div className='quiz-score'>
                             <span className='incorrect'>↻</span>
                             &nbsp;
-                            {mapQuizState.incorrectCount}
-                        </div>
-                        <button className={clsx('mode-button')} onClick={onStartDiscover}>
-                            Abbrechen
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {/* Capital Quiz 2 Header */}
-            {gameMode === 'capital2' && choiceGameState && !choiceGameCompleted && (
-                <>
-                    <div className='game-header-item'>
-                        <span className='quiz-score'>
-                            <span className='correct'>✔</span>
-                            &nbsp;
-                            {choiceGameState.answeredCorrectly.size} / {choiceGameState.randomizedCountries.length}
-                        </span>
-                    </div>
-                    <div className='game-header-item'>
-                        <div className='quiz-score'>
-                            <span className='incorrect'>↻</span>
-                            &nbsp;
-                            {choiceGameState.incorrectCount}
+                            {incorrectCount ?? 0}
                         </div>
                         <button className={clsx('mode-button')} onClick={onStartDiscover}>
                             Abbrechen

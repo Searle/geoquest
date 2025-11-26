@@ -15,7 +15,16 @@ interface QuizState {
     answerHistory: AnswerHistoryItem[];
 }
 
-export function useChoiceGame(countries: CountryData[]) {
+export interface UseChoiceGame {
+    quizState: QuizState | null;
+    currentQuestion: CountryData | null;
+    isCompleted: boolean;
+    startQuiz: () => void;
+    handleAnswer: (country: string) => void;
+    resetQuiz: () => void;
+}
+
+export function useChoiceGame(countries: CountryData[]): UseChoiceGame {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
     const startQuiz = useCallback(() => {

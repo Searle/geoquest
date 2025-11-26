@@ -56,9 +56,6 @@
 
 .quiz-question {
     font-size: 1.3rem;
-}
-
-.quiz-question strong {
     font-weight: 700;
     color: #ecf0f1;
 }
