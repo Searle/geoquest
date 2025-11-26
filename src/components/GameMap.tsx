@@ -220,6 +220,8 @@ const GameMap = () => {
                     getCountryHighlight={getCountryHighlight}
                     onCountriesLoaded={handleCountriesLoaded}
                     isAnsweredCorrectly={isAnsweredCorrectly}
+                    answeredCorrectlyCount={quizState?.answeredCorrectly.size ?? 0}
+                    hasIncorrectFeedback={feedback === 'incorrect'}
                 />
             </div>
 
@@ -232,7 +234,10 @@ const GameMap = () => {
                         top: `${hoverInfo.y + 10}px`,
                     }}
                 >
-                    <div className='country-name'>{getCountryName(hoverInfo.country, 'deu')}</div>
+                    <div className='country-name'>
+                        {getCountryName(hoverInfo.country, 'deu')}
+                        <span className='country-name-cca3'>({hoverInfo.country.cca3})</span>
+                    </div>
                     <div className='country-capital'>Hauptstadt: {getCapital(hoverInfo.country)}</div>
                 </div>
             )}

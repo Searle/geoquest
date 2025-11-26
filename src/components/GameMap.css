@@ -97,8 +97,8 @@
 /* Scrollable content section */
 .game-content {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
+    display: flex;
 }
 
 /* Quiz Completed */
@@ -149,6 +149,14 @@
     font-size: 1.1rem;
     margin-bottom: 0.25rem;
     color: #ecf0f1;
+}
+
+.country-name-cca3 {
+    display: inline-block;
+    padding-left: 10px;
+    font-weight: 100;
+    font-size: 0.8rem;
+    opacity: 0.3;
 }
 
 .country-capital {

@@ -5,6 +5,8 @@ import type { GeoPath } from 'd3-geo';
 
 import type { CountryData } from '../types/countries-json.js';
 
+import './Country.css';
+
 export const DEBUG_COUNTRY_MEMO = false;
 
 export interface CountryProps {
@@ -15,13 +17,23 @@ export interface CountryProps {
     onCountryHover: (country: CountryData, event: React.MouseEvent<SVGPathElement>) => void;
     onCountryLeave: () => void;
     highlightState: 'correct' | 'incorrect' | 'hovered' | null;
+    forOverlay?: true;
 }
 
 /**
  * Memoized Country component - only re-renders when its props change
  */
 export const Country = memo<CountryProps>(
-    ({ country, feature, pathGenerator, onCountryClick, onCountryHover, onCountryLeave, highlightState }) => {
+    ({
+        country,
+        feature,
+        pathGenerator,
+        onCountryClick,
+        onCountryHover,
+        onCountryLeave,
+        highlightState,
+        forOverlay,
+    }) => {
         // Debug: Track which props changed
         const prevProps = useRef<CountryProps | undefined>(undefined);
 
@@ -81,21 +93,27 @@ export const Country = memo<CountryProps>(
 
                     // Dynamic hit area size based on country area
                     // Smaller countries get larger hit areas for better UX
-                    const hitAreaSize = country.area < 30000 ? 12 : country.area < 100000 ? 8 : 4;
+                    const hitAreaSize = country.area < 30000 ? 16 : country.area < 100000 ? 8 : 0;
+
+                    const handlers = {
+                        onMouseMove: (e: React.MouseEvent<SVGPathElement, MouseEvent>) => onCountryHover(country, e),
+                        onMouseLeave: () => onCountryLeave(),
+                        onClick: (e: React.MouseEvent<SVGPathElement, MouseEvent>) => onCountryClick(country, e),
+                    };
 
                     return (
                         <g key={`${country.cca3}-${index}`}>
                             {/* Invisible hit area with thick stroke for edges and fill for interior */}
-                            <path
-                                d={pathData}
-                                fill='transparent'
-                                stroke='transparent'
-                                strokeWidth={hitAreaSize}
-                                vectorEffect='non-scaling-stroke'
-                                onMouseMove={(e) => onCountryHover(country, e)}
-                                onMouseLeave={() => onCountryLeave()}
-                                onClick={(e) => onCountryClick(country, e)}
-                            />
+                            {!forOverlay && hitAreaSize > 0 && (
+                                <path
+                                    d={pathData}
+                                    fill='transparent'
+                                    stroke='transparent'
+                                    strokeWidth={hitAreaSize}
+                                    vectorEffect='non-scaling-stroke'
+                                    {...handlers}
+                                />
+                            )}
                             {/* Visible path */}
                             <path
                                 d={pathData}
@@ -106,7 +124,7 @@ export const Country = memo<CountryProps>(
                                 })}
                                 data-country={country.cca3}
                                 vectorEffect='non-scaling-stroke'
-                                style={{ pointerEvents: 'none' }}
+                                {...(forOverlay || hitAreaSize > 0 ? { style: { pointerEvents: 'none' } } : handlers)}
                             />
                         </g>
                     );

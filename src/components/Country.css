@@ -1,0 +1,24 @@
+/* Country base styles */
+.country {
+    fill: #3498db;
+    stroke: #2c3e50;
+    stroke-width: 1px;
+    cursor: pointer;
+    --x-transition: all 0.1s ease;
+}
+
+.country.hovered {
+    fill: #51b6fa;
+    stroke-width: 2px;
+}
+
+/* Quiz feedback styles */
+.country.quiz-target {
+    fill: #7bed9f;
+    stroke: #2ed573;
+}
+
+.country.quiz-incorrect {
+    fill: #e74c3c;
+    stroke: #7e2a21;
+}

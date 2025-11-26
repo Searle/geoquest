@@ -1,5 +1,19 @@
 /* SVG Map */
 .region-map {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+}
+
+.region-map-inner {
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+.region-map-svg {
     display: block;
     width: 100%;
     height: auto;
@@ -11,33 +25,15 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: auto;
+}
+
+.region-map-shadow {
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.region-map-no-events {
     pointer-events: none;
-}
-
-/* Country base styles */
-.country {
-    fill: #3498db;
-    stroke: #2c3e50;
-    stroke-width: 1px;
-    cursor: pointer;
-    --x-transition: all 0.1s ease;
-}
-
-.country.hovered {
-    fill: #51b6fa;
-    stroke-width: 2px;
-}
-
-/* Quiz feedback styles */
-.country.quiz-target {
-    fill: #7bed9f;
-    stroke: #2ed573;
-}
-
-.country.quiz-incorrect {
-    fill: #e74c3c;
-    stroke: #7e2a21;
 }
 
 /* Loading state */
@@ -48,4 +44,39 @@
     min-height: 400px;
     font-size: 1.2rem;
     color: #7f8c8d;
+}
+
+/* Zoomable zone indicators */
+.zoomable-zone {
+    fill: transparent;
+    stroke: #95a5a6;
+    stroke-width: 0.4px;
+    stroke-dasharray: 2 1;
+    pointer-events: none;
+}
+
+/* Close button when zoomed */
+.zoom-close-button {
+    position: absolute;
+    top: 16px;
+    right: 40px;
+    padding: 8px 16px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s ease;
+    z-index: 10;
+}
+
+.zoom-close-button:hover {
+    background: #34495e;
+}
+
+.zoom-close-button:active {
+    background: #1a252f;
 }
