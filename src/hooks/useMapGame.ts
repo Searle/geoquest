@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 import type { CountryData } from '../types/countries-json.js';
+import { shuffleArray } from '../utils/arrayUtils.js';
 
 interface QuizState {
     randomizedCountries: CountryData[];
@@ -24,22 +25,10 @@ export interface UseMapGame {
     isAnsweredCorrectly: (country: CountryData) => boolean;
 }
 
-// Shuffle array using Fisher-Yates algorithm
-const shuffleArray = <T>(array: T[]): T[] => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-};
-
 export function useMapGame(countries: CountryData[]): UseMapGame {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
     const startQuiz = useCallback(() => {
-        if (countries.length === 0) return;
-
         setQuizState({
             randomizedCountries: shuffleArray(countries),
             incorrectCount: 0,

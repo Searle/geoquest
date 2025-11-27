@@ -1,3 +1,4 @@
+import { shuffleArray } from './arrayUtils.js';
 import type { CountryData } from './countryData.js';
 
 /**
@@ -19,24 +20,11 @@ export function getCapitalOptions(
         (country) => country.cca3 !== correctCountry.cca3 && country.capital?.length > 0,
     );
 
-    // Shuffle other countries
-    const shuffled = [...otherCountries];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-
     // Take first N capitals as wrong answers
-    const wrongCapitals = shuffled.slice(0, wrongAnswerCount).map((country) => country.capital![0]);
+    const wrongCapitals = shuffleArray(otherCountries)
+        .slice(0, wrongAnswerCount)
+        .map((country) => country.capital![0]);
 
     // Combine correct and wrong answers
-    const allOptions = [correctCapital, ...wrongCapitals];
-
-    // Shuffle the combined array
-    for (let i = allOptions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
-    }
-
-    return allOptions;
+    return shuffleArray([correctCapital, ...wrongCapitals]);
 }

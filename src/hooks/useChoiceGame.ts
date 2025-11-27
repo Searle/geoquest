@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import type { CountryData } from '../utils/countryData.js';
+import { shuffleArray } from '../utils/arrayUtils.js';
 
-export interface AnswerHistoryItem {
+interface AnswerHistoryItem {
     country: CountryData;
     userAnswer: string; // Capital name the user selected
     isCorrect: boolean;
@@ -28,15 +29,8 @@ export function useChoiceGame(countries: CountryData[]): UseChoiceGame {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
     const startQuiz = useCallback(() => {
-        // Fisher-Yates shuffle
-        const shuffled = [...countries];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-
         setQuizState({
-            randomizedCountries: shuffled,
+            randomizedCountries: shuffleArray(countries),
             incorrectCount: 0,
             answeredCorrectly: new Set(),
             answerHistory: [],
