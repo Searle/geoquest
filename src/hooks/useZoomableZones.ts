@@ -67,7 +67,7 @@ export function useZoomableZones({
         if (activeZone !== null && correctAnswerGiven) {
             // Correct answer while zoomed - close after delay
             const timer = setTimeout(() => {
-                setActiveZone(null);
+                closeZoom();
             }, 1000);
 
             return () => clearTimeout(timer);
@@ -75,7 +75,7 @@ export function useZoomableZones({
 
         // Update previous count
         previousAnsweredCount.current = answeredCorrectlyCount;
-    }, [answeredCorrectlyCount, activeZone]);
+    }, [answeredCorrectlyCount, activeZone, closeZoom]);
 
     // Close zoom when incorrect feedback is dismissed
     useEffect(() => {
@@ -84,12 +84,12 @@ export function useZoomableZones({
 
         if (activeZone !== null && incorrectDismissed) {
             // Incorrect feedback dismissed - close zoom
-            setActiveZone(null);
+            closeZoom();
         }
 
         // Update previous state
         previousIncorrectFeedback.current = hasIncorrectFeedback;
-    }, [hasIncorrectFeedback, activeZone]);
+    }, [hasIncorrectFeedback, activeZone, closeZoom]);
 
     const isZoomed = activeZone !== null;
 

@@ -43,19 +43,19 @@ export const GameHeader = ({
                     </select>
                 </div>
                 <div className='game-header-item'>
-                    <span>Spiel starten:</span>
-
+                    <span>Karte lernen:</span>
                     <button onClick={onSetGameMode['map-country']} disabled={countries.length === 0}>
-                        Länder-Karte
+                        Länder
                     </button>
                     <button onClick={onSetGameMode['map-capital']} disabled={countries.length === 0}>
-                        Hauptstadt-Karte
+                        Hauptstädte
+                    </button>
+                    <span>&nbsp; Quiz:</span>
+                    <button onClick={onSetGameMode['choice-country']} disabled={countries.length === 0}>
+                        Länder
                     </button>
                     <button onClick={onSetGameMode['choice-capital']} disabled={countries.length === 0}>
-                        Hauptstadt-Quiz
-                    </button>
-                    <button onClick={onSetGameMode['choice-country']} disabled={countries.length === 0}>
-                        Länder-Quiz
+                        Hauptstädte
                     </button>
                 </div>
             </>

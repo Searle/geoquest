@@ -8,7 +8,7 @@ export const getAllCountries = (): CountryData[] => {
 
 // Get countries by Region
 export const getCountriesByRegion = (region: Region): CountryData[] =>
-    getAllCountries().filter((country) => country.region === region);
+    getAllCountries().filter((country) => country.region === region && country.cca3 !== 'UNK');
 
 // Get country by cca3 code
 export const getCountryByCca3 = (cca3: string): CountryData | undefined =>

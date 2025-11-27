@@ -93,7 +93,7 @@ export const Country = memo<CountryProps>(
 
                     // Dynamic hit area size based on country area
                     // Smaller countries get larger hit areas for better UX
-                    const hitAreaSize = country.area < 30000 ? 16 : country.area < 100000 ? 8 : 0;
+                    const hitAreaSize = country.area < 10000 ? 16 : country.area < 30000 ? 8 : 0;
 
                     const handlers = {
                         onMouseMove: (e: React.MouseEvent<SVGPathElement, MouseEvent>) => onCountryHover(country, e),

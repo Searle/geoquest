@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 
 import { getCountriesByRegion, type CountryData } from '../utils/countryData.js';
@@ -45,8 +45,7 @@ const RegionMap = ({
     const [countries, setCountries] = useState<CountryGeoData[]>([]);
     const [loading, setLoading] = useState(true);
     const [hoveredZone, setHoveredZone] = useState<string | null>(null);
-    const [savedScrollPosition, setSavedScrollPosition] = useState(0);
-    const previousActiveZone = useRef<ZoomableZone | null>(null);
+    const savedScrollPosition = useRef(0);
 
     useEffect(() => {
         const loadCountryData = async () => {
@@ -102,44 +101,31 @@ const RegionMap = ({
         hasIncorrectFeedback,
     });
 
-    // Wrapper to save scroll position before zooming
+    // Wrapper to zoom to zone - save scroll position when opening zoom
     const handleZoomToZone = (zone: ZoomableZone) => {
-        // Save current scroll position
-        const scrollContainer = document.querySelector('.game-content');
-        if (scrollContainer) {
-            setSavedScrollPosition(scrollContainer.scrollTop);
+        if (activeZone === null) {
+            // Only save if not already zoomed
+            const scrollContainer = document.querySelector('.region-map-inner');
+            if (scrollContainer) {
+                savedScrollPosition.current = scrollContainer.scrollTop;
+            }
         }
         zoomToZoneBase(zone);
     };
 
-    // Wrapper to restore scroll position when closing
+    // Wrapper to close zoom - restore scroll position
     const handleCloseZoom = () => {
         closeZoomBase();
-        // Restore scroll position after a brief delay (let render complete)
-        setTimeout(() => {
-            const scrollContainer = document.querySelector('.game-content');
-            if (scrollContainer) {
-                scrollContainer.scrollTop = savedScrollPosition;
-            }
-        }, 0);
-    };
-
-    // Restore scroll position when zoom closes (including auto-close)
-    useEffect(() => {
-        // Detect when zoom closes (activeZone changes from non-null to null)
-        if (previousActiveZone.current !== null && activeZone === null) {
-            // Zoom just closed - restore scroll position
-            setTimeout(() => {
-                const scrollContainer = document.querySelector('.game-content');
+        // Restore after a delay to let the DOM update
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const scrollContainer = document.querySelector('.region-map-inner');
                 if (scrollContainer) {
-                    scrollContainer.scrollTop = savedScrollPosition;
+                    scrollContainer.scrollTop = savedScrollPosition.current;
                 }
-            }, 0);
-        }
-
-        // Update previous state
-        previousActiveZone.current = activeZone;
-    }, [activeZone, savedScrollPosition]);
+            });
+        });
+    };
 
     // Update viewBox when zoomed
     const displayViewBox = activeZone
