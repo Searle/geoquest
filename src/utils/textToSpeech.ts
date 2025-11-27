@@ -3,6 +3,23 @@
  * Handles pronunciation in different languages based on text content
  */
 
+/**
+ * Speech rate for English text-to-speech
+ */
+const RATE_ENG = 0.8;
+
+/**
+ * Speech rate for German text-to-speech
+ */
+const RATE_GER = 1.1;
+
+/**
+ * Get the appropriate speech rate based on language
+ */
+const getRateForLanguage = (lang: string): number => {
+    return lang.startsWith('en') ? RATE_ENG : RATE_GER;
+};
+
 export interface SpeechOptions {
     /** Language code (e.g., 'de-DE', 'en-US') */
     lang?: string;
@@ -134,8 +151,11 @@ export const speak = (text: string, options: SpeechOptions = {}): void => {
             utterance.voice = voice;
         }
     }
+    // Use provided rate, or auto-detect based on language
     if (options.rate !== undefined) {
         utterance.rate = options.rate;
+    } else if (options.lang) {
+        utterance.rate = getRateForLanguage(options.lang);
     }
     if (options.pitch !== undefined) {
         utterance.pitch = options.pitch;
@@ -209,8 +229,8 @@ export const speakSequence = (
         // Update text for this segment
         utterance.text = segment.text;
 
-        // Apply common options
-        utterance.rate = options.rate ?? 1;
+        // Apply common options, auto-detecting rate based on language if not specified
+        utterance.rate = options.rate ?? getRateForLanguage(segment.lang);
         utterance.pitch = options.pitch ?? 1;
         utterance.volume = options.volume ?? 1;
 

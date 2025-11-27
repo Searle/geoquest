@@ -31,7 +31,7 @@ export const GameHeader = ({
     onRegionChange,
     onSetGameMode,
 }: GameHeaderProps) => (
-    <div className='game-header'>
+    <div className={clsx('game-header', { 'game-header-game': gameMode !== 'discover' })}>
         {/* Discover Mode Header */}
         {gameMode === 'discover' && (
             <>
@@ -77,7 +77,9 @@ export const GameHeader = ({
                         &nbsp;
                         {incorrectCount ?? 0}
                     </div>
-                    <button onClick={onSetGameMode['discover']}>Abbrechen</button>
+                    <button className='game-cancel-button' onClick={onSetGameMode['discover']}>
+                        Abbrechen
+                    </button>
                 </div>
             </>
         )}

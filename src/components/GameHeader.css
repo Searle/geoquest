@@ -6,6 +6,11 @@
     color: #b1e0ff;
     justify-content: space-between;
     padding: 0 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.game-header-game {
+    background-color: #1471b0;
 }
 
 .game-header-item {
@@ -13,6 +18,13 @@
     gap: 0.5rem;
     align-items: center;
     height: 80px;
+}
+
+.game-cancel-button {
+    background-color: #449dda;
+    border-color: #62b9f2;
+    color: #a4dbff;
+    margin-left: 20px;
 }
 
 .quiz-question {

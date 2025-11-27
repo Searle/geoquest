@@ -88,14 +88,11 @@ export const MapGame = ({
                 // 1. Country name in its detected language (German or English)
                 // 2. "Hauptstadt" always in German
                 // 3. Capital name always in English
-                speakSequence(
-                    [
-                        { text: countryName, lang: countryLanguageCode },
-                        { text: 'Hauptstadt', lang: 'de-DE' },
-                        { text: capital, lang: 'en-US' },
-                    ],
-                    { rate: 1.1 },
-                );
+                speakSequence([
+                    { text: countryName, lang: countryLanguageCode },
+                    { text: 'Hauptstadt', lang: 'de-DE' },
+                    { text: capital, lang: 'en-US' },
+                ]);
             }
 
             if (runningQuiz) {
@@ -113,11 +110,11 @@ export const MapGame = ({
                 if (gameMode === 'map-country') {
                     const { name: countryName, language } = getCountryNameWithLanguage(country, 'deu');
                     const languageCode = getLanguageCodeForTTS(language);
-                    speak(countryName, { lang: languageCode, rate: 1.1 });
+                    speak(countryName, { lang: languageCode });
                 } else if (gameMode === 'map-capital') {
                     const capital = getCapital(country);
                     // Capitals are typically in their native language, use English pronunciation
-                    speak(capital, { lang: 'en-US', rate: 1.1 });
+                    speak(capital, { lang: 'en-US' });
                 }
 
                 // Store click position for showing label

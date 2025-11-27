@@ -13,6 +13,10 @@
     flex: 1;
 }
 
+.region-map-inner > svg {
+    padding-top: 1rem;
+}
+
 .region-map-svg {
     display: block;
     width: 100%;

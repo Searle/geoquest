@@ -48,12 +48,12 @@ export const ChoiceGame = ({
             if (isCapitalMode) {
                 // In capital mode, user clicks on capitals (which are in native language)
                 const capital = getCapital(selectedCountry);
-                speak(capital, { lang: 'en-US', rate: 1.1 });
+                speak(capital, { lang: 'en-US' });
             } else {
                 // In country mode, user clicks on country names (in German)
                 const { name: countryName, language } = getCountryNameWithLanguage(selectedCountry, 'deu');
                 const languageCode = getLanguageCodeForTTS(language);
-                speak(countryName, { lang: languageCode, rate: 1.1 });
+                speak(countryName, { lang: languageCode });
             }
         }
 
