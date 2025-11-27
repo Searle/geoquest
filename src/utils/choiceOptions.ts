@@ -11,7 +11,7 @@ import { getCountryName } from './countryData.js';
  * @param answeredCorrectly Optional set of country codes that have been answered correctly
  * @returns Array of shuffled option strings (1 correct + N wrong)
  */
-export function getQuizOptions(
+function getQuizOptions(
     correctCountry: CountryData,
     allCountries: CountryData[],
     extractValue: (country: CountryData) => string | undefined,
@@ -20,24 +20,20 @@ export function getQuizOptions(
 ): string[] {
     const correctValue = extractValue(correctCountry) || '';
 
-    // Filter out the correct country and countries without valid values
-    let otherCountries = allCountries.filter((country) => {
+    // Filter out the correct country, countries without valid values, and countries answered correctly
+    const otherCountries = allCountries.filter((country) => {
         const value = extractValue(country);
-        return country.cca3 !== correctCountry.cca3 && value && value.length > 0;
+        const isValidOption = country.cca3 !== correctCountry.cca3 && value && value.length > 0;
+        const notAnsweredCorrectly = !answeredCorrectly || !answeredCorrectly.has(country.cca3);
+        return isValidOption && notAnsweredCorrectly;
     });
 
-    // Try to avoid countries that have been answered correctly
-    if (answeredCorrectly && answeredCorrectly.size > 0) {
-        const unansweredCountries = otherCountries.filter((country) => !answeredCorrectly.has(country.cca3));
-        // Only use unanswered countries if we have enough for wrong answers
-        if (unansweredCountries.length >= wrongAnswerCount) {
-            otherCountries = unansweredCountries;
-        }
-    }
+    // Determine the actual number of wrong answers we can provide
+    const actualWrongAnswerCount = Math.min(wrongAnswerCount, otherCountries.length);
 
     // Take first N values as wrong answers
     const wrongValues = shuffleArray(otherCountries)
-        .slice(0, wrongAnswerCount)
+        .slice(0, actualWrongAnswerCount)
         .map((country) => extractValue(country)!);
 
     // Combine correct and wrong answers

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
-import { getCapitalOptions, getCountryOptions } from '../utils/capitalSelection.js';
+import { getCapitalOptions, getCountryOptions } from '../utils/choiceOptions.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
 import type { Region } from '../types/countries-json.js';
