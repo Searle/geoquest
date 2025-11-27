@@ -46,11 +46,18 @@ export function useMapGame(countries: CountryData[]): UseMapGame {
     const clearFeedback = useCallback(() => {
         if (!quizState || quizState.feedback !== 'incorrect') return;
 
-        // Move current question to the end of the list
+        // Move current question 10 positions later (or to end if not enough items)
         const updatedCountries = [...quizState.randomizedCountries];
-        const currentQ = updatedCountries[quizState.answeredCorrectly.size];
-        updatedCountries.splice(quizState.answeredCorrectly.size, 1);
-        updatedCountries.push(currentQ);
+        const currentIndex = quizState.answeredCorrectly.size;
+        const currentQ = updatedCountries[currentIndex];
+        updatedCountries.splice(currentIndex, 1);
+
+        // Calculate target position: 10 items after current, or at end
+        const remainingItems = updatedCountries.length - currentIndex;
+        const targetOffset = Math.min(10, remainingItems);
+        const targetIndex = currentIndex + targetOffset;
+
+        updatedCountries.splice(targetIndex, 0, currentQ);
 
         setQuizState({
             ...quizState,

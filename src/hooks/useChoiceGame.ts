@@ -83,11 +83,17 @@ export function useChoiceGame(countries: CountryData[]): UseChoiceGame {
                     );
                 } else {
                     newIncorrectCount++;
-                    // Move current question to end of list
+                    // Move current question 10 positions later (or to end if not enough items)
                     const currentIndex = prev.answeredCorrectly.size;
                     const questionToMove = newRandomizedCountries[currentIndex];
                     newRandomizedCountries.splice(currentIndex, 1);
-                    newRandomizedCountries.push(questionToMove);
+
+                    // Calculate target position: 10 items after current, or at end
+                    const remainingItems = newRandomizedCountries.length - currentIndex;
+                    const targetOffset = Math.min(10, remainingItems);
+                    const targetIndex = currentIndex + targetOffset;
+
+                    newRandomizedCountries.splice(targetIndex, 0, questionToMove);
                 }
 
                 return {
