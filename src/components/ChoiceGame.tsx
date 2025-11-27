@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 
 import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
-import { getCapitalOptions } from '../utils/capitalSelection.js';
+import { getCapitalOptions, getCountryOptions } from '../utils/capitalSelection.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
 import type { Region } from '../types/countries-json.js';
@@ -30,6 +30,12 @@ export const ChoiceGame = ({
     const { currentQuestion, quizState, isCompleted, handleAnswer: onAnswerSelect } = choiceGame;
     const incorrectCount = quizState?.incorrectCount ?? 0;
 
+    // Determine mode-specific configuration
+    const isCapitalMode = gameMode === 'choice-capital';
+    const getOptions = isCapitalMode ? getCapitalOptions : getCountryOptions;
+    const getCorrectAnswer = isCapitalMode ? getCapital : (country: CountryData) => getCountryName(country, 'deu');
+    const getQuestionValue = isCapitalMode ? (country: CountryData) => getCountryName(country, 'deu') : getCapital;
+
     // Filter out answers for the current question to avoid showing the correct answer
     const answerHistory = useMemo(() => {
         if (!currentQuestion || !quizState?.answerHistory) return [];
@@ -37,10 +43,10 @@ export const ChoiceGame = ({
     }, [currentQuestion, quizState?.answerHistory]);
 
     // Generate multiple choice options
-    const capitalOptions = useMemo(() => {
+    const quizOptions = useMemo(() => {
         if (!currentQuestion) return [];
-        return getCapitalOptions(currentQuestion, countries, 3, quizState?.answeredCorrectly);
-    }, [currentQuestion, countries, quizState?.answeredCorrectly]);
+        return getOptions(currentQuestion, countries, 3, quizState?.answeredCorrectly);
+    }, [currentQuestion, countries, quizState?.answeredCorrectly, getOptions]);
 
     const header = (
         <GameHeader
@@ -50,8 +56,8 @@ export const ChoiceGame = ({
             answeredCorrectly={quizState?.answeredCorrectly}
             randomizedCountries={quizState?.randomizedCountries}
             incorrectCount={quizState?.incorrectCount}
-            label='Hauptstadt von'
-            value={gameMode === 'map-capital' ? getCapital(currentQuestion) : getCountryName(currentQuestion, 'deu')}
+            label={isCapitalMode ? 'Hauptstadt von' : 'Land mit Hauptstadt'}
+            value={isCapitalMode ? getCountryName(currentQuestion, 'deu') : getCapital(currentQuestion)}
             onRegionChange={onRegionChange}
             onSetGameMode={onSetGameMode}
         />
@@ -85,9 +91,9 @@ export const ChoiceGame = ({
                 {/* Question Area */}
                 <div className={clsx('quiz-area', 'quiz-question-area')}>
                     <div className={clsx('quiz-area', 'quiz-questions')}>
-                        {capitalOptions.map((capital) => (
-                            <button key={capital} onClick={() => onAnswerSelect(capital)}>
-                                {capital}
+                        {quizOptions.map((option) => (
+                            <button key={option} onClick={() => onAnswerSelect(option)}>
+                                {option}
                             </button>
                         ))}
                     </div>
@@ -106,7 +112,7 @@ export const ChoiceGame = ({
                                         'answer-item-incorrect': !item.isCorrect,
                                     })}
                                 >
-                                    <div className='answer-item-country'>{getCountryName(item.country, 'deu')}</div>
+                                    <div className='answer-item-country'>{getQuestionValue(item.country)}</div>
                                     <div className='answer-item-capital'>
                                         {item.isCorrect ? (
                                             <span className='answer-item-correct-mark'>✓</span>
@@ -117,7 +123,7 @@ export const ChoiceGame = ({
                                         {!item.isCorrect && (
                                             <span className='answer-item-correct-answer'>
                                                 {' '}
-                                                (richtig: {getCapital(item.country)})
+                                                (richtig: {getCorrectAnswer(item.country)})
                                             </span>
                                         )}
                                     </div>

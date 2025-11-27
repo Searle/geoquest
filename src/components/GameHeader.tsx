@@ -54,6 +54,9 @@ export const GameHeader = ({
                     <button onClick={onSetGameMode['choice-capital']} disabled={countries.length === 0}>
                         Hauptstadt-Quiz
                     </button>
+                    <button onClick={onSetGameMode['choice-country']} disabled={countries.length === 0}>
+                        Länder-Quiz
+                    </button>
                 </div>
             </>
         )}

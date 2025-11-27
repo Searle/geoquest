@@ -37,8 +37,12 @@ const GeoGuess = () => {
             setGameMode('map-capital');
         },
         'choice-capital': () => {
-            choiceGame.startQuiz();
+            choiceGame.startQuiz('choice-capital');
             setGameMode('choice-capital');
+        },
+        'choice-country': () => {
+            choiceGame.startQuiz('choice-country');
+            setGameMode('choice-country');
         },
     };
 
@@ -52,8 +56,8 @@ const GeoGuess = () => {
 
     return (
         <div className='geo-guess'>
-            {/* Capital Choice Component */}
-            {gameMode === 'choice-capital' && (
+            {/* Choice Game Components */}
+            {(gameMode === 'choice-capital' || gameMode === 'choice-country') && (
                 <ChoiceGame
                     gameMode={gameMode}
                     choiceGame={choiceGame}
