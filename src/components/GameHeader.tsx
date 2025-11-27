@@ -36,11 +36,7 @@ export const GameHeader = ({
         {gameMode === 'discover' && (
             <>
                 <div className='game-header-item'>
-                    <select
-                        className='mode-select'
-                        value={region}
-                        onChange={(e) => onRegionChange(e.target.value as unknown as Region)}
-                    >
+                    <select value={region} onChange={(e) => onRegionChange(e.target.value as unknown as Region)}>
                         {regions.map((r) => (
                             <option key={r}>{r}</option>
                         ))}
@@ -49,25 +45,13 @@ export const GameHeader = ({
                 <div className='game-header-item'>
                     <span>Spiel starten:</span>
 
-                    <button
-                        className='mode-button'
-                        onClick={onSetGameMode['map-country']}
-                        disabled={countries.length === 0}
-                    >
+                    <button onClick={onSetGameMode['map-country']} disabled={countries.length === 0}>
                         Länder-Karte
                     </button>
-                    <button
-                        className='mode-button'
-                        onClick={onSetGameMode['map-capital']}
-                        disabled={countries.length === 0}
-                    >
+                    <button onClick={onSetGameMode['map-capital']} disabled={countries.length === 0}>
                         Hauptstadt-Karte
                     </button>
-                    <button
-                        className='mode-button'
-                        onClick={onSetGameMode['choice-capital']}
-                        disabled={countries.length === 0}
-                    >
+                    <button onClick={onSetGameMode['choice-capital']} disabled={countries.length === 0}>
                         Hauptstadt-Quiz
                     </button>
                 </div>
@@ -90,9 +74,7 @@ export const GameHeader = ({
                         &nbsp;
                         {incorrectCount ?? 0}
                     </div>
-                    <button className={clsx('mode-button')} onClick={onSetGameMode['discover']}>
-                        Abbrechen
-                    </button>
+                    <button onClick={onSetGameMode['discover']}>Abbrechen</button>
                 </div>
             </>
         )}

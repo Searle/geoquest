@@ -139,9 +139,7 @@ export const MapGame = ({
                     <div className='final-score'>
                         <div>Fehlversuche: {incorrectCount}</div>
                     </div>
-                    <button className='mode-button' onClick={() => onSetGameMode[gameMode]()}>
-                        Nochmal starten
-                    </button>
+                    <button onClick={() => onSetGameMode[gameMode]()}>Nochmal starten</button>
                 </div>
             </>
         );

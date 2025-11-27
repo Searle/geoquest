@@ -1,8 +1,8 @@
 /* Capital Quiz 2 - Multiple Choice Quiz */
-.choice-game-container {
+.choice-game {
     display: flex;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 1rem;
+    padding: 1rem;
     height: 100%;
     overflow: hidden;
 }
@@ -17,78 +17,33 @@
 }
 
 /* Question Area */
+.quiz-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #ecf0f1;
+    border-radius: 12px;
+}
+
 .quiz-question-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-    background-color: #ecf0f1;
-    border-radius: 12px;
+    width: 40%;
+    padding: 0;
+    background-color: transparent;
 }
 
-.quiz-question-title {
-    font-size: 1.5rem;
-    color: #7f8c8d;
-    margin: 0;
-    font-weight: 400;
+.quiz-questions {
+    flex: none;
 }
 
-.quiz-question-country {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin: 0;
-    font-weight: 700;
-}
-
-.capital-choice-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    width: 100%;
-    max-width: 500px;
-}
-
-.capital-choice-button {
-    padding: 1.5rem 2rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    background-color: white;
-    color: #3498db;
-    border: 4px solid #3498db;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.capital-choice-button:hover {
-    background-color: #3498db;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.capital-choice-button:active {
-    transform: translateY(0);
-}
-
-/* Answer Area */
 .quiz-answer-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 2rem;
-    background-color: #ecf0f1;
-    border-radius: 12px;
     overflow: hidden;
 }
 
 .answer-area-title {
-    font-size: 1.5rem;
-    color: #2c3e50;
+    font-size: 1rem;
+    color: #acbfd1;
     margin: 0;
     font-weight: 600;
 }
@@ -101,22 +56,12 @@
     gap: 0.75rem;
 }
 
-.answer-list-empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    color: #95a5a6;
-    font-size: 1.1rem;
-    font-style: italic;
-}
-
 .answer-item {
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.1rem;
     animation: slideIn 0.3s ease;
 }
 

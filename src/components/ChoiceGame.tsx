@@ -28,14 +28,19 @@ export const ChoiceGame = ({
     onSetGameMode,
 }: ChoiceGameProps) => {
     const { currentQuestion, quizState, isCompleted, handleAnswer: onAnswerSelect } = choiceGame;
-    const answerHistory = quizState?.answerHistory ?? [];
     const incorrectCount = quizState?.incorrectCount ?? 0;
+
+    // Filter out answers for the current question to avoid showing the correct answer
+    const answerHistory = useMemo(() => {
+        if (!currentQuestion || !quizState?.answerHistory) return [];
+        return quizState.answerHistory.filter((item) => item.country.cca3 !== currentQuestion.cca3);
+    }, [currentQuestion, quizState?.answerHistory]);
 
     // Generate multiple choice options
     const capitalOptions = useMemo(() => {
         if (!currentQuestion) return [];
-        return getCapitalOptions(currentQuestion, countries);
-    }, [currentQuestion, countries]);
+        return getCapitalOptions(currentQuestion, countries, 3, quizState?.answeredCorrectly);
+    }, [currentQuestion, countries, quizState?.answeredCorrectly]);
 
     const header = (
         <GameHeader
@@ -45,7 +50,7 @@ export const ChoiceGame = ({
             answeredCorrectly={quizState?.answeredCorrectly}
             randomizedCountries={quizState?.randomizedCountries}
             incorrectCount={quizState?.incorrectCount}
-            label='Klicke'
+            label='Hauptstadt von'
             value={gameMode === 'map-capital' ? getCapital(currentQuestion) : getCountryName(currentQuestion, 'deu')}
             onRegionChange={onRegionChange}
             onSetGameMode={onSetGameMode}
@@ -62,9 +67,7 @@ export const ChoiceGame = ({
                     <div className='final-score'>
                         <div>Fehlversuche: {incorrectCount ?? 0}</div>
                     </div>
-                    <button className='mode-button' onClick={onSetGameMode[gameMode]}>
-                        Nochmal starten
-                    </button>
+                    <button onClick={onSetGameMode[gameMode]}>Nochmal starten</button>
                 </div>
             </>
         );
@@ -77,18 +80,13 @@ export const ChoiceGame = ({
     return (
         <>
             {header}
-            <div className='choice-game-container'>
+
+            <div className='choice-game'>
                 {/* Question Area */}
-                <div className='quiz-question-area'>
-                    <h2 className='quiz-question-title'>Die Hauptstadt von:</h2>
-                    <h1 className='quiz-question-country'>{getCountryName(currentQuestion, 'deu')}</h1>
-                    <div className='capital-choice-buttons'>
+                <div className={clsx('quiz-area', 'quiz-question-area')}>
+                    <div className={clsx('quiz-area', 'quiz-questions')}>
                         {capitalOptions.map((capital) => (
-                            <button
-                                key={capital}
-                                className='capital-choice-button'
-                                onClick={() => onAnswerSelect(capital)}
-                            >
+                            <button key={capital} onClick={() => onAnswerSelect(capital)}>
                                 {capital}
                             </button>
                         ))}
@@ -96,12 +94,10 @@ export const ChoiceGame = ({
                 </div>
 
                 {/* Answer Area */}
-                <div className='quiz-answer-area'>
+                <div className={clsx('quiz-area', 'quiz-answer-area')}>
                     <h3 className='answer-area-title'>Antworten:</h3>
                     <div className='answer-list'>
-                        {answerHistory.length === 0 ? (
-                            <div className='answer-list-empty'>Noch keine Antworten</div>
-                        ) : (
+                        {answerHistory.length > 0 &&
                             answerHistory.map((item) => (
                                 <div
                                     key={item.timestamp}
@@ -126,8 +122,7 @@ export const ChoiceGame = ({
                                         )}
                                     </div>
                                 </div>
-                            ))
-                        )}
+                            ))}
                     </div>
                 </div>
             </div>

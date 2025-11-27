@@ -18,3 +18,42 @@ body {
     display: flex;
     flex-direction: column;
 }
+
+select {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid #3498db;
+    background-color: white;
+    color: #3498db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 4px solid #b1e0ff;
+    background-color: white;
+    color: #3498db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+    background-color: #ecf0f1;
+    transform: translateY(-1px);
+}
+
+button.active {
+    background-color: #3498db;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
