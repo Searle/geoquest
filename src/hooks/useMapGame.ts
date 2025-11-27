@@ -1,14 +1,19 @@
 import { useState, useCallback } from 'react';
 
 import type { CountryData } from '../types/countries-json.js';
-import { shuffleArray } from '../utils/arrayUtils.js';
+import {
+    type BaseQuizState,
+    createBaseQuizState,
+    getCurrentQuestion,
+    isQuizCompleted,
+    requeueQuestion,
+    isAnswerCorrect,
+    markAsCorrect,
+} from './useGameUtils.js';
 
-interface QuizState {
-    randomizedCountries: CountryData[];
-    incorrectCount: number;
+interface QuizState extends BaseQuizState {
     feedback: 'correct' | 'incorrect' | null;
     clickedCountry: CountryData | null; // Track which country was clicked (for incorrect answers)
-    answeredCorrectly: Set<string>; // Track cca3 codes of correctly answered countries
 }
 
 export interface UseMapGame {
@@ -28,96 +33,70 @@ export interface UseMapGame {
 export function useMapGame(countries: CountryData[]): UseMapGame {
     const [quizState, setQuizState] = useState<QuizState | null>(null);
 
-    const startQuiz = useCallback(() => {
-        setQuizState({
-            randomizedCountries: shuffleArray(countries),
-            incorrectCount: 0,
-            feedback: null,
-            clickedCountry: null,
-            answeredCorrectly: new Set<string>(),
-        });
-    }, [countries]);
-
     const resetQuiz = useCallback(() => {
         setQuizState(null);
     }, []);
 
-    // Clear feedback and move to next question (called on any click after incorrect answer)
-    const clearFeedback = useCallback(() => {
-        if (!quizState || quizState.feedback !== 'incorrect') return;
-
-        // Move current question 10 positions later (or to end if not enough items)
-        const updatedCountries = [...quizState.randomizedCountries];
-        const currentIndex = quizState.answeredCorrectly.size;
-        const currentQ = updatedCountries[currentIndex];
-        updatedCountries.splice(currentIndex, 1);
-
-        // Calculate target position: 10 items after current, or at end
-        const remainingItems = updatedCountries.length - currentIndex;
-        const targetOffset = Math.min(10, remainingItems);
-        const targetIndex = currentIndex + targetOffset;
-
-        updatedCountries.splice(targetIndex, 0, currentQ);
-
+    const startQuiz = useCallback(() => {
         setQuizState({
-            ...quizState,
-            randomizedCountries: updatedCountries,
+            ...createBaseQuizState(countries),
             feedback: null,
             clickedCountry: null,
         });
-    }, [quizState]);
+    }, [countries]);
 
-    const handleAnswer = useCallback(
-        (country: CountryData) => {
-            if (!quizState) return;
+    // Clear feedback and move to next question (called on any click after incorrect answer)
+    const clearFeedback = useCallback(() => {
+        setQuizState((prev) => {
+            if (!prev || prev.feedback !== 'incorrect') return prev;
 
-            const currentQuestion = quizState.randomizedCountries[quizState.answeredCorrectly.size];
-            if (!currentQuestion) return;
+            const currentIndex = prev.answeredCorrectly.size;
+            const updatedCountries = requeueQuestion(prev.randomizedCountries, currentIndex);
 
-            const isCorrect = country.cca3 === currentQuestion.cca3;
+            return {
+                ...prev,
+                randomizedCountries: updatedCountries,
+                feedback: null,
+                clickedCountry: null,
+            };
+        });
+    }, []);
+
+    const handleAnswer = useCallback((country: CountryData) => {
+        setQuizState((prev) => {
+            if (!prev) return prev;
+
+            const currentQuestion = getCurrentQuestion(prev);
+            if (!currentQuestion) return prev;
+
+            const isCorrect = isAnswerCorrect(country, currentQuestion);
 
             if (isCorrect) {
                 // Correct answer - add to answeredCorrectly set and advance immediately
-                const newAnsweredCorrectly = new Set(quizState.answeredCorrectly);
-                newAnsweredCorrectly.add(country.cca3);
+                const newAnsweredCorrectly = markAsCorrect(prev.answeredCorrectly, country);
 
-                const nextIndex = newAnsweredCorrectly.size;
-                if (nextIndex < quizState.randomizedCountries.length) {
-                    // Move to next question
-                    setQuizState({
-                        ...quizState,
-                        feedback: null,
-                        clickedCountry: null,
-                        answeredCorrectly: newAnsweredCorrectly,
-                    });
-                } else {
-                    // Quiz completed
-                    setQuizState({
-                        ...quizState,
-                        feedback: null,
-                        clickedCountry: null,
-                        answeredCorrectly: newAnsweredCorrectly,
-                    });
-                }
+                return {
+                    ...prev,
+                    feedback: null,
+                    clickedCountry: null,
+                    answeredCorrectly: newAnsweredCorrectly,
+                };
             } else {
                 // Incorrect answer - show feedback and track clicked country
-                // Question will be moved to end when feedback is cleared
-                setQuizState({
-                    ...quizState,
-                    incorrectCount: quizState.incorrectCount + 1,
+                // Question will be requeued when feedback is cleared
+                return {
+                    ...prev,
+                    incorrectCount: prev.incorrectCount + 1,
                     feedback: 'incorrect',
                     clickedCountry: country,
-                });
-
-                // Wait for user to click to dismiss (no auto-timeout)
+                };
             }
-        },
-        [quizState],
-    );
+        });
+    }, []);
 
-    const currentQuestion = quizState ? quizState.randomizedCountries[quizState.answeredCorrectly.size] : null;
+    const currentQuestion = quizState ? getCurrentQuestion(quizState) : null;
 
-    const isCompleted = quizState ? quizState.answeredCorrectly.size >= quizState.randomizedCountries.length : false;
+    const isCompleted = quizState ? isQuizCompleted(quizState) : false;
 
     const isCorrectCountry = useCallback(
         (country: CountryData) => {

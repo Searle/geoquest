@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 
 import { getCountryName, getCountryNameWithLanguage, getCapital, type CountryData } from '../utils/countryData.js';
-import { getCapitalOptions, getCountryOptions } from '../utils/choiceOptions.js';
+import { getCountryDataOptions } from '../utils/choiceOptions.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
 import type { Region } from '../types/countries-json.js';
@@ -33,40 +33,32 @@ export const ChoiceGame = ({
 
     // Determine mode-specific configuration
     const isCapitalMode = gameMode === 'choice-capital';
-    const getOptions = isCapitalMode ? getCapitalOptions : getCountryOptions;
-    const getCorrectAnswer = isCapitalMode ? getCapital : (country: CountryData) => getCountryName(country, 'deu');
     const getQuestionValue = isCapitalMode ? (country: CountryData) => getCountryName(country, 'deu') : getCapital;
+    const getAnswerValue = isCapitalMode ? getCapital : (country: CountryData) => getCountryName(country, 'deu');
 
     // Handle option click with TTS
-    const handleOptionClick = (option: string) => {
+    const handleOptionClick = (selectedCountry: CountryData) => {
         // Check if the answer is correct before speaking
         if (!currentQuestion) return;
 
-        const correctAnswer = isCapitalMode ? getCapital(currentQuestion) : getCorrectAnswer(currentQuestion);
-        const isCorrect = option === correctAnswer;
+        const isCorrect = selectedCountry.cca3 === currentQuestion.cca3;
 
         // Only speak if the answer is correct
         if (isCorrect) {
             if (isCapitalMode) {
                 // In capital mode, user clicks on capitals (which are in native language)
-                speak(option, { lang: 'en-US', rate: 1.1 });
+                const capital = getCapital(selectedCountry);
+                speak(capital, { lang: 'en-US', rate: 1.1 });
             } else {
                 // In country mode, user clicks on country names (in German)
-                // Need to find which country this option belongs to for proper language detection
-                const country = countries.find((c) => getCountryName(c, 'deu') === option);
-                if (country) {
-                    const { language } = getCountryNameWithLanguage(country, 'deu');
-                    const languageCode = getLanguageCodeForTTS(language);
-                    speak(option, { lang: languageCode, rate: 1.1 });
-                } else {
-                    // Fallback to German if country not found
-                    speak(option, { lang: 'de-DE', rate: 1.1 });
-                }
+                const { name: countryName, language } = getCountryNameWithLanguage(selectedCountry, 'deu');
+                const languageCode = getLanguageCodeForTTS(language);
+                speak(countryName, { lang: languageCode, rate: 1.1 });
             }
         }
 
         // Submit the answer
-        onAnswerSelect(option);
+        onAnswerSelect(selectedCountry);
     };
 
     // Filter out answers for the current question to avoid showing the correct answer
@@ -78,8 +70,12 @@ export const ChoiceGame = ({
     // Generate multiple choice options
     const quizOptions = useMemo(() => {
         if (!currentQuestion) return [];
-        return getOptions(currentQuestion, countries, 3, quizState?.answeredCorrectly);
-    }, [currentQuestion, countries, quizState?.answeredCorrectly, getOptions]);
+        // Filter countries that have the required field (capital or country name)
+        const filterFn = isCapitalMode
+            ? (country: CountryData) => country.capital && country.capital.length > 0
+            : () => true; // Country names always exist
+        return getCountryDataOptions(currentQuestion, countries, 3, quizState?.answeredCorrectly, filterFn);
+    }, [currentQuestion, countries, quizState?.answeredCorrectly, isCapitalMode]);
 
     const header = (
         <GameHeader
@@ -124,9 +120,9 @@ export const ChoiceGame = ({
                 {/* Question Area */}
                 <div className={clsx('quiz-area', 'quiz-question-area')}>
                     <div className={clsx('quiz-area', 'quiz-questions')}>
-                        {quizOptions.map((option) => (
-                            <button key={option} onClick={() => handleOptionClick(option)}>
-                                {option}
+                        {quizOptions.map((country) => (
+                            <button key={country.cca3} onClick={() => handleOptionClick(country)}>
+                                {getAnswerValue(country)}
                             </button>
                         ))}
                     </div>
@@ -152,11 +148,11 @@ export const ChoiceGame = ({
                                         ) : (
                                             <span className='answer-item-incorrect-mark'>✗</span>
                                         )}
-                                        {item.userAnswer}
+                                        {getAnswerValue(item.userAnswer)}
                                         {!item.isCorrect && (
                                             <span className='answer-item-correct-answer'>
                                                 {' '}
-                                                (richtig: {getCorrectAnswer(item.country)})
+                                                (richtig: {getAnswerValue(item.country)})
                                             </span>
                                         )}
                                     </div>

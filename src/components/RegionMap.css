@@ -78,7 +78,7 @@
 /* Close button when zoomed */
 .zoom-close-button {
     position: absolute;
-    top: 16px;
+    top: 40px;
     right: 40px;
     padding: 8px 16px;
     background: #2c3e50;

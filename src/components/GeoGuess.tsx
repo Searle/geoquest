@@ -43,11 +43,11 @@ const GeoGuess = () => {
             setGameMode('map-capital');
         },
         'choice-capital': () => {
-            choiceGame.startQuiz('choice-capital');
+            choiceGame.startQuiz();
             setGameMode('choice-capital');
         },
         'choice-country': () => {
-            choiceGame.startQuiz('choice-country');
+            choiceGame.startQuiz();
             setGameMode('choice-country');
         },
     };

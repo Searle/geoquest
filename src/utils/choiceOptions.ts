@@ -3,6 +3,40 @@ import type { CountryData } from './countryData.js';
 import { getCountryName } from './countryData.js';
 
 /**
+ * Generates multiple choice country options for a quiz question
+ * @param correctCountry The country that is the correct answer
+ * @param allCountries All countries in the current region
+ * @param wrongAnswerCount Number of incorrect options to generate (default: 3)
+ * @param answeredCorrectly Optional set of country codes that have been answered correctly
+ * @param filterFn Optional function to filter valid countries (e.g., must have a capital)
+ * @returns Array of shuffled CountryData objects (1 correct + N wrong)
+ */
+export function getCountryDataOptions(
+    correctCountry: CountryData,
+    allCountries: CountryData[],
+    wrongAnswerCount: number = 3,
+    answeredCorrectly?: Set<string>,
+    filterFn?: (country: CountryData) => boolean,
+): CountryData[] {
+    // Filter out the correct country, countries answered correctly, and apply optional filter
+    const otherCountries = allCountries.filter((country) => {
+        const isValidOption = country.cca3 !== correctCountry.cca3;
+        const notAnsweredCorrectly = !answeredCorrectly || !answeredCorrectly.has(country.cca3);
+        const passesFilter = !filterFn || filterFn(country);
+        return isValidOption && notAnsweredCorrectly && passesFilter;
+    });
+
+    // Determine the actual number of wrong answers we can provide
+    const actualWrongAnswerCount = Math.min(wrongAnswerCount, otherCountries.length);
+
+    // Take first N countries as wrong answers
+    const wrongCountries = shuffleArray(otherCountries).slice(0, actualWrongAnswerCount);
+
+    // Combine correct and wrong answers
+    return shuffleArray([correctCountry, ...wrongCountries]);
+}
+
+/**
  * Generates multiple choice options for a quiz question
  * @param correctCountry The country that is the correct answer
  * @param allCountries All countries in the current region
