@@ -65,15 +65,14 @@ export function useChoiceGame(countries: CountryData[]): UseChoiceGame {
                 timestamp: Date.now(),
             };
 
-            let newAnswerHistory = [newHistoryItem, ...prev.answerHistory];
+            // Remove all previous attempts for the current question before adding the new one
+            let newAnswerHistory = [
+                newHistoryItem,
+                ...prev.answerHistory.filter((item) => item.country.cca3 !== currentQuestion.cca3),
+            ];
 
             if (isCorrect) {
                 const newAnsweredCorrectly = markAsCorrect(prev.answeredCorrectly, currentQuestion);
-
-                // Remove all previous wrong attempts for this country
-                newAnswerHistory = newAnswerHistory.filter(
-                    (item) => item.country.cca3 !== currentQuestion.cca3 || item.isCorrect,
-                );
 
                 return {
                     ...prev,
