@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
 
 import RegionMap from './RegionMap.js';
-import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
+import { getCountryName, getCountryNameWithLanguage, getCapital, type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
 import { type UseMapGame } from '../hooks/useMapGame.js';
 import { GameHeader } from './GameHeader.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
+import { speak, speakSequence, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
 
 import './MapGame.css';
 
@@ -77,6 +78,26 @@ export const MapGame = ({
     // Country interaction handlers
     const handleCountryClick = useCallback(
         (country: CountryData, event?: React.MouseEvent) => {
+            // Text-to-speech for discover mode
+            if (gameMode === 'discover') {
+                const { name: countryName, language } = getCountryNameWithLanguage(country, 'deu');
+                const capital = getCapital(country);
+                const countryLanguageCode = getLanguageCodeForTTS(language);
+
+                // Speak in three parts with different languages:
+                // 1. Country name in its detected language (German or English)
+                // 2. "Hauptstadt" always in German
+                // 3. Capital name always in English
+                speakSequence(
+                    [
+                        { text: countryName, lang: countryLanguageCode },
+                        { text: 'Hauptstadt', lang: 'de-DE' },
+                        { text: capital, lang: 'en-US' },
+                    ],
+                    { rate: 1.1 },
+                );
+            }
+
             if (runningQuiz) {
                 // Don't allow clicking on already correctly answered countries
                 if (isAnsweredCorrectly(country)) {
@@ -86,6 +107,17 @@ export const MapGame = ({
                 // If showing incorrect feedback, dismiss it (handled by overlay)
                 if (feedback === 'incorrect') {
                     return;
+                }
+
+                // Text-to-speech: Speak the clicked country or capital name
+                if (gameMode === 'map-country') {
+                    const { name: countryName, language } = getCountryNameWithLanguage(country, 'deu');
+                    const languageCode = getLanguageCodeForTTS(language);
+                    speak(countryName, { lang: languageCode, rate: 1.1 });
+                } else if (gameMode === 'map-capital') {
+                    const capital = getCapital(country);
+                    // Capitals are typically in their native language, use English pronunciation
+                    speak(capital, { lang: 'en-US', rate: 1.1 });
                 }
 
                 // Store click position for showing label

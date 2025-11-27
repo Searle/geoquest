@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import clsx from 'clsx';
 
-import { getCountryName, getCapital, type CountryData } from '../utils/countryData.js';
+import { getCountryName, getCountryNameWithLanguage, getCapital, type CountryData } from '../utils/countryData.js';
 import { getCapitalOptions, getCountryOptions } from '../utils/choiceOptions.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
 import type { Region } from '../types/countries-json.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
+import { speak, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
 
 import './ChoiceGame.css';
 
@@ -35,6 +36,38 @@ export const ChoiceGame = ({
     const getOptions = isCapitalMode ? getCapitalOptions : getCountryOptions;
     const getCorrectAnswer = isCapitalMode ? getCapital : (country: CountryData) => getCountryName(country, 'deu');
     const getQuestionValue = isCapitalMode ? (country: CountryData) => getCountryName(country, 'deu') : getCapital;
+
+    // Handle option click with TTS
+    const handleOptionClick = (option: string) => {
+        // Check if the answer is correct before speaking
+        if (!currentQuestion) return;
+
+        const correctAnswer = isCapitalMode ? getCapital(currentQuestion) : getCorrectAnswer(currentQuestion);
+        const isCorrect = option === correctAnswer;
+
+        // Only speak if the answer is correct
+        if (isCorrect) {
+            if (isCapitalMode) {
+                // In capital mode, user clicks on capitals (which are in native language)
+                speak(option, { lang: 'en-US', rate: 1.1 });
+            } else {
+                // In country mode, user clicks on country names (in German)
+                // Need to find which country this option belongs to for proper language detection
+                const country = countries.find((c) => getCountryName(c, 'deu') === option);
+                if (country) {
+                    const { language } = getCountryNameWithLanguage(country, 'deu');
+                    const languageCode = getLanguageCodeForTTS(language);
+                    speak(option, { lang: languageCode, rate: 1.1 });
+                } else {
+                    // Fallback to German if country not found
+                    speak(option, { lang: 'de-DE', rate: 1.1 });
+                }
+            }
+        }
+
+        // Submit the answer
+        onAnswerSelect(option);
+    };
 
     // Filter out answers for the current question to avoid showing the correct answer
     const answerHistory = useMemo(() => {
@@ -92,7 +125,7 @@ export const ChoiceGame = ({
                 <div className={clsx('quiz-area', 'quiz-question-area')}>
                     <div className={clsx('quiz-area', 'quiz-questions')}>
                         {quizOptions.map((option) => (
-                            <button key={option} onClick={() => onAnswerSelect(option)}>
+                            <button key={option} onClick={() => handleOptionClick(option)}>
                                 {option}
                             </button>
                         ))}

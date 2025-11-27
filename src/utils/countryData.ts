@@ -31,6 +31,26 @@ export const getCountryName = (country: CountryData | null, language: string = '
     return country?.name.common ?? '';
 };
 
+// Get country name and detect which language was actually used
+export const getCountryNameWithLanguage = (
+    country: CountryData | null,
+    preferredLanguage: string = 'deu',
+): { name: string; language: string } => {
+    // Try translations first
+    if (country?.translations?.[preferredLanguage]) {
+        return {
+            name: country.translations[preferredLanguage].common,
+            language: preferredLanguage,
+        };
+    }
+
+    // Fall back to common name (English)
+    return {
+        name: country?.name.common ?? '',
+        language: 'eng',
+    };
+};
+
 // Get capital city name
 export const getCapital = (country: CountryData | null): string => {
     return country?.capital?.[0] || '';

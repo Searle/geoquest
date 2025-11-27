@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import type { CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
@@ -7,6 +7,7 @@ import { useChoiceGame } from '../hooks/useChoiceGame.js';
 import { ChoiceGame } from './ChoiceGame.js';
 import { MapGame } from './MapGame.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
+import { initializeTTS } from '../utils/textToSpeech.js';
 
 import './GeoGuess.css';
 
@@ -14,6 +15,11 @@ const GeoGuess = () => {
     const [region, setRegion] = useState<Region>('Africa');
     const [gameMode, setGameMode] = useState<GameMode>('discover');
     const [countries, setCountries] = useState<CountryData[]>([]);
+
+    // Initialize TTS on component mount for faster first use
+    useEffect(() => {
+        initializeTTS();
+    }, []);
 
     const handleRegionChange = (region: string) => {
         setRegion(region as Region);
