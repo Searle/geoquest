@@ -11,6 +11,11 @@ import {
     markAsCorrect,
 } from './useGameUtils.js';
 
+/**
+ * Number of questions to wait before showing a failed question again
+ */
+export const REQUEUE_OFFSET = 15;
+
 interface QuizState extends BaseQuizState {
     feedback: 'correct' | 'incorrect' | null;
     clickedCountry: CountryData | null; // Track which country was clicked (for incorrect answers)
@@ -51,7 +56,7 @@ export function useMapGame(countries: CountryData[]): UseMapGame {
             if (!prev || prev.feedback !== 'incorrect') return prev;
 
             const currentIndex = prev.answeredCorrectly.size;
-            const updatedCountries = requeueQuestion(prev.randomizedCountries, currentIndex);
+            const updatedCountries = requeueQuestion(prev.randomizedCountries, currentIndex, REQUEUE_OFFSET);
 
             return {
                 ...prev,

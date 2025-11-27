@@ -2,11 +2,6 @@ import type { CountryData } from '../utils/countryData.js';
 import { shuffleArray } from '../utils/arrayUtils.js';
 
 /**
- * Number of questions to wait before showing a failed question again
- */
-export const REQUEUE_OFFSET = 5;
-
-/**
  * Base quiz state shared by all game modes
  */
 export interface BaseQuizState {
@@ -61,7 +56,7 @@ export function markAsCorrect(answeredCorrectly: Set<string>, country: CountryDa
  * Requeue a question after incorrect answer by moving it N positions later
  * (or to the end if there aren't enough remaining items)
  */
-export function requeueQuestion<T>(items: T[], currentIndex: number, offset: number = REQUEUE_OFFSET): T[] {
+export function requeueQuestion<T>(items: T[], currentIndex: number, offset: number): T[] {
     const result = [...items];
     const itemToMove = result[currentIndex];
 

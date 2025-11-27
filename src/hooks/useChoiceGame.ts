@@ -10,6 +10,11 @@ import {
     markAsCorrect,
 } from './useGameUtils.js';
 
+/**
+ * Number of questions to wait before showing a failed question again
+ */
+export const REQUEUE_OFFSET = 5;
+
 interface AnswerHistoryItem {
     country: CountryData;
     userAnswer: CountryData; // The country the user selected
@@ -78,7 +83,7 @@ export function useChoiceGame(countries: CountryData[]): UseChoiceGame {
             } else {
                 // Incorrect answer - requeue question and increment error count
                 const currentIndex = prev.answeredCorrectly.size;
-                const newRandomizedCountries = requeueQuestion(prev.randomizedCountries, currentIndex);
+                const newRandomizedCountries = requeueQuestion(prev.randomizedCountries, currentIndex, REQUEUE_OFFSET);
 
                 return {
                     ...prev,
