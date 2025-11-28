@@ -27,3 +27,5 @@ Thumbs.db
 *.log
 tmp/
 temp/
+
+make-geonames.org-capitals-translations-json.pl

@@ -1,7 +1,13 @@
 import { useCallback, useState } from 'react';
 
 import RegionMap from './RegionMap.js';
-import { getCountryName, getCountryNameWithLanguage, getCapital, type CountryData } from '../utils/countryData.js';
+import {
+    getCountryName,
+    getCountryNameWithLanguage,
+    getCapital,
+    getCapitalWithLanguage,
+    type CountryData,
+} from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
 import { type UseMapGame } from '../hooks/useMapGame.js';
 import { GameHeader } from './GameHeader.js';
@@ -61,7 +67,9 @@ export const MapGame = ({
             randomizedCountries={quizState?.randomizedCountries}
             incorrectCount={quizState?.incorrectCount}
             label='Klicke'
-            value={gameMode === 'map-capital' ? getCapital(currentQuestion) : getCountryName(currentQuestion, 'deu')}
+            value={
+                gameMode === 'map-capital' ? getCapital(currentQuestion, 'deu') : getCountryName(currentQuestion, 'deu')
+            }
             onRegionChange={onRegionChange}
             onSetGameMode={onSetGameMode}
         />
@@ -80,18 +88,19 @@ export const MapGame = ({
         (country: CountryData, event?: React.MouseEvent) => {
             // Text-to-speech for discover mode
             if (gameMode === 'discover') {
-                const { name: countryName, language } = getCountryNameWithLanguage(country, 'deu');
-                const capital = getCapital(country);
-                const countryLanguageCode = getLanguageCodeForTTS(language);
+                const { name: countryName, language: countryLanguage } = getCountryNameWithLanguage(country, 'deu');
+                const { name: capitalName, language: capitalLanguage } = getCapitalWithLanguage(country, 'deu');
+                const countryLanguageCode = getLanguageCodeForTTS(countryLanguage);
+                const capitalLanguageCode = getLanguageCodeForTTS(capitalLanguage);
 
                 // Speak in three parts with different languages:
                 // 1. Country name in its detected language (German or English)
                 // 2. "Hauptstadt" always in German
-                // 3. Capital name always in English
+                // 3. Capital name in its detected language (German or English)
                 speakSequence([
                     { text: countryName, lang: countryLanguageCode },
                     { text: 'Hauptstadt', lang: 'de-DE' },
-                    { text: capital, lang: 'en-US' },
+                    { text: capitalName, lang: capitalLanguageCode },
                 ]);
             }
 
@@ -112,9 +121,9 @@ export const MapGame = ({
                     const languageCode = getLanguageCodeForTTS(language);
                     speak(countryName, { lang: languageCode });
                 } else if (gameMode === 'map-capital') {
-                    const capital = getCapital(country);
-                    // Capitals are typically in their native language, use English pronunciation
-                    speak(capital, { lang: 'en-US' });
+                    const { name: capitalName, language } = getCapitalWithLanguage(country, 'deu');
+                    const languageCode = getLanguageCodeForTTS(language);
+                    speak(capitalName, { lang: languageCode });
                 }
 
                 // Store click position for showing label
@@ -204,7 +213,7 @@ export const MapGame = ({
                         {getCountryName(hoverInfo.country, 'deu')}
                         <span className='country-name-cca3'>({hoverInfo.country.cca3})</span>
                     </div>
-                    <div className='country-capital'>Hauptstadt: {getCapital(hoverInfo.country)}</div>
+                    <div className='country-capital'>Hauptstadt: {getCapital(hoverInfo.country, 'deu')}</div>
                 </div>
             )}
             {/* Click-anywhere overlay to dismiss incorrect feedback */}
@@ -230,7 +239,9 @@ export const MapGame = ({
                     >
                         {gameMode === 'map-capital' ? (
                             <>
-                                <div className='incorrect-country-label-capital'>{getCapital(clickedCountry)}</div>
+                                <div className='incorrect-country-label-capital'>
+                                    {getCapital(clickedCountry, 'deu')}
+                                </div>
                                 <div className='incorrect-country-label-country'>
                                     {getCountryName(clickedCountry, 'deu')}
                                 </div>

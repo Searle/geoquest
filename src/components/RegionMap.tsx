@@ -54,7 +54,7 @@ const RegionMap = ({
             // Load GeoJSON for each country
             const countryDataPromises = regionCountries.map(async (country) => {
                 try {
-                    const response = await fetch(`data/countries/data/${country.cca3.toLowerCase()}.geo.json`);
+                    const response = await fetch(`data/countries/${country.cca3.toLowerCase()}.geo.json`);
                     if (!response.ok) {
                         console.warn(`Failed to load GeoJSON for ${country.name.common}`);
                         return null;
@@ -173,7 +173,7 @@ const RegionMap = ({
     const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly(country));
 
     if (loading) {
-        return <div className='loading'>Loading map data...</div>;
+        return <div className='loading'>Karte wird geladen...</div>;
     }
 
     // Get highlight state for main SVG (only 'correct', hovered/incorrect in overlay)

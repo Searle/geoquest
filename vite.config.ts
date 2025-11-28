@@ -15,7 +15,7 @@ export default defineConfig({
     server: {
         port: 5173,
         fs: {
-            // Allow serving files from the data/countries submodule
+            // Allow serving files from ../data/
             allow: ['..'],
         },
     },

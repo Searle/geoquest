@@ -1,7 +1,13 @@
 import { useMemo } from 'react';
 import clsx from 'clsx';
 
-import { getCountryName, getCountryNameWithLanguage, getCapital, type CountryData } from '../utils/countryData.js';
+import {
+    getCountryName,
+    getCountryNameWithLanguage,
+    getCapital,
+    getCapitalWithLanguage,
+    type CountryData,
+} from '../utils/countryData.js';
 import { getCountryDataOptions } from '../utils/choiceOptions.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
@@ -33,8 +39,12 @@ export const ChoiceGame = ({
 
     // Determine mode-specific configuration
     const isCapitalMode = gameMode === 'choice-capital';
-    const getQuestionValue = isCapitalMode ? (country: CountryData) => getCountryName(country, 'deu') : getCapital;
-    const getAnswerValue = isCapitalMode ? getCapital : (country: CountryData) => getCountryName(country, 'deu');
+    const getQuestionValue = isCapitalMode
+        ? (country: CountryData) => getCountryName(country, 'deu')
+        : (country: CountryData) => getCapital(country, 'deu');
+    const getAnswerValue = isCapitalMode
+        ? (country: CountryData) => getCapital(country, 'deu')
+        : (country: CountryData) => getCountryName(country, 'deu');
 
     // Handle option click with TTS
     const handleOptionClick = (selectedCountry: CountryData) => {
@@ -46,14 +56,13 @@ export const ChoiceGame = ({
         // Only speak if the answer is correct
         if (isCorrect) {
             if (isCapitalMode) {
-                // In capital mode, user clicks on capitals (which are in native language)
-                const capital = getCapital(selectedCountry);
-                speak(capital, { lang: 'en-US' });
+                // In capital mode, user clicks on capitals (German or English fallback)
+                const { name: capitalName, language } = getCapitalWithLanguage(selectedCountry, 'deu');
+                speak(capitalName, { lang: getLanguageCodeForTTS(language) });
             } else {
                 // In country mode, user clicks on country names (in German)
                 const { name: countryName, language } = getCountryNameWithLanguage(selectedCountry, 'deu');
-                const languageCode = getLanguageCodeForTTS(language);
-                speak(countryName, { lang: languageCode });
+                speak(countryName, { lang: getLanguageCodeForTTS(language) });
             }
         }
 
@@ -86,7 +95,7 @@ export const ChoiceGame = ({
             randomizedCountries={quizState?.randomizedCountries}
             incorrectCount={quizState?.incorrectCount}
             label={isCapitalMode ? 'Hauptstadt von' : 'Land mit Hauptstadt'}
-            value={isCapitalMode ? getCountryName(currentQuestion, 'deu') : getCapital(currentQuestion)}
+            value={isCapitalMode ? getCountryName(currentQuestion, 'deu') : getCapital(currentQuestion, 'deu')}
             onRegionChange={onRegionChange}
             onSetGameMode={onSetGameMode}
         />
