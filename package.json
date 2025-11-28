@@ -1,6 +1,7 @@
 {
-    "name": "geoguess",
+    "name": "geoquest",
     "version": "0.0.1",
+    "description": "GeoQuest - Länder und Hauptstädte dieser Erde",
     "type": "module",
     "scripts": {
         "dev": "vite",

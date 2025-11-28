@@ -1,13 +1,11 @@
-import GeoGuess from './components/GeoGuess.js';
+import { GeoQuest } from './components/GeoQuest.js';
 
 import './App.css';
 
-function App() {
+export function App() {
     return (
         <div className='app'>
-            <GeoGuess />
+            <GeoQuest />
         </div>
     );
 }
-
-export default App;

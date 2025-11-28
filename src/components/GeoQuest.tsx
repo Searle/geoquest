@@ -9,9 +9,9 @@ import { MapGame } from './MapGame.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { initializeTTS } from '../utils/textToSpeech.js';
 
-import './GeoGuess.css';
+import './GeoQuest.css';
 
-const GeoGuess = () => {
+export const GeoQuest = () => {
     const [region, setRegion] = useState<Region>('Africa');
     const [gameMode, setGameMode] = useState<GameMode>('discover');
     const [countries, setCountries] = useState<CountryData[]>([]);
@@ -90,5 +90,3 @@ const GeoGuess = () => {
         </div>
     );
 };
-
-export default GeoGuess;
