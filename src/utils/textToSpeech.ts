@@ -202,6 +202,7 @@ const getOrCreateUtterance = (lang: string): SpeechSynthesisUtterance => {
 
 /**
  * Speaks multiple text segments in sequence, each with their own language
+ * Merges consecutive segments with the same language for smoother playback
  * @param segments - Array of { text, lang } objects to speak in order
  * @param options - Common speech options (rate, pitch, volume) applied to all segments
  */
@@ -217,11 +218,25 @@ export const speakSequence = (
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
 
+    // Merge consecutive segments with the same language
+    const mergedSegments: Array<{ text: string; lang: string }> = [];
+    for (const segment of segments) {
+        const lastSegment = mergedSegments[mergedSegments.length - 1];
+        if (lastSegment && lastSegment.lang === segment.lang) {
+            // Merge with previous segment - keep leading punctuation if present
+            lastSegment.text += segment.text;
+        } else {
+            // Add as new segment - strip leading comma/punctuation when not merging
+            const text = segment.text.replace(/^[,;]\s*/, '');
+            mergedSegments.push({ text, lang: segment.lang });
+        }
+    }
+
     // Speak segments recursively
     const speakSegment = (index: number) => {
-        if (index >= segments.length) return;
+        if (index >= mergedSegments.length) return;
 
-        const segment = segments[index];
+        const segment = mergedSegments[index];
 
         // Get cached utterance for this language
         const utterance = getOrCreateUtterance(segment.lang);

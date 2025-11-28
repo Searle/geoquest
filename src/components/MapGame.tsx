@@ -95,11 +95,11 @@ export const MapGame = ({
 
                 // Speak in three parts with different languages:
                 // 1. Country name in its detected language (German or English)
-                // 2. "Hauptstadt" always in German
-                // 3. Capital name in its detected language (German or English)
+                // 2. ", Hauptstadt" in German (comma provides pause when merged)
+                // 3. capital name in its detected language
                 speakSequence([
                     { text: countryName, lang: countryLanguageCode },
-                    { text: 'Hauptstadt', lang: 'de-DE' },
+                    { text: ', Hauptstadt', lang: 'de-DE' },
                     { text: capitalName, lang: capitalLanguageCode },
                 ]);
             }
