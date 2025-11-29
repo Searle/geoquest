@@ -46,6 +46,8 @@ const RegionMap = ({
     const [loading, setLoading] = useState(true);
     const [hoveredZone, setHoveredZone] = useState<string | null>(null);
     const savedScrollPosition = useRef(0);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const svgContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const loadCountryData = async () => {
@@ -103,12 +105,9 @@ const RegionMap = ({
 
     // Wrapper to zoom to zone - save scroll position when opening zoom
     const handleZoomToZone = (zone: ZoomableZone) => {
-        if (activeZone === null) {
+        if (activeZone === null && scrollContainerRef.current) {
             // Only save if not already zoomed
-            const scrollContainer = document.querySelector('.region-map-inner');
-            if (scrollContainer) {
-                savedScrollPosition.current = scrollContainer.scrollTop;
-            }
+            savedScrollPosition.current = scrollContainerRef.current.scrollTop;
         }
         zoomToZoneBase(zone);
     };
@@ -119,9 +118,8 @@ const RegionMap = ({
         // Restore after a delay to let the DOM update
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                const scrollContainer = document.querySelector('.region-map-inner');
-                if (scrollContainer) {
-                    scrollContainer.scrollTop = savedScrollPosition.current;
+                if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTop = savedScrollPosition.current;
                 }
             });
         });
@@ -142,9 +140,9 @@ const RegionMap = ({
 
     // Mouse tracking for zone hover detection on parent container
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (isZoomed) return; // Don't track when zoomed
+        if (isZoomed || !svgContainerRef.current) return; // Don't track when zoomed
 
-        const svg = event.currentTarget.querySelector('.region-map-svg') as SVGSVGElement;
+        const svg = svgContainerRef.current.querySelector('svg') as SVGSVGElement;
         if (!svg) return;
 
         const rect = svg.getBoundingClientRect();
@@ -193,24 +191,31 @@ const RegionMap = ({
 
     return (
         <div className={styles.container}>
-            <div className={styles.inner} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-                <MapLayers
-                    answeredCountries={answeredCountries}
-                    unansweredCountries={unansweredCountries}
-                    overlayCountryData={overlayCountryData}
-                    overlayHighlight={overlayHighlight}
-                    zones={zones}
-                    isZoomed={isZoomed}
-                    hoveredZone={hoveredZone}
-                    iconRadius={iconRadius}
-                    viewBox={viewBox1}
-                    pathGenerator={pathGenerator}
-                    onCountryClick={onCountryClick}
-                    onCountryHover={onCountryHover}
-                    onCountryLeave={onCountryLeave}
-                    getMainHighlight={getMainHighlight}
-                    handleZoomToZone={handleZoomToZone}
-                />
+            <div
+                ref={scrollContainerRef}
+                className={styles.inner}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+            >
+                <div ref={svgContainerRef}>
+                    <MapLayers
+                        answeredCountries={answeredCountries}
+                        unansweredCountries={unansweredCountries}
+                        overlayCountryData={overlayCountryData}
+                        overlayHighlight={overlayHighlight}
+                        zones={zones}
+                        isZoomed={isZoomed}
+                        hoveredZone={hoveredZone}
+                        iconRadius={iconRadius}
+                        viewBox={viewBox1}
+                        pathGenerator={pathGenerator}
+                        onCountryClick={onCountryClick}
+                        onCountryHover={onCountryHover}
+                        onCountryLeave={onCountryLeave}
+                        getMainHighlight={getMainHighlight}
+                        handleZoomToZone={handleZoomToZone}
+                    />
+                </div>
             </div>
 
             {/* Close button when zoomed */}

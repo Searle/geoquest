@@ -20,6 +20,7 @@ interface HoverInfo {
     country: CountryData;
     x: number;
     y: number;
+    showLeft: boolean;
 }
 
 interface ClickPosition {
@@ -141,6 +142,7 @@ export const MapGame = ({
             country,
             x: event.clientX,
             y: event.clientY,
+            showLeft: event.clientX > document.documentElement.clientWidth / 2,
         });
     }, []);
 
@@ -209,11 +211,21 @@ export const MapGame = ({
                         } as React.CSSProperties
                     }
                 >
-                    <div className={styles.tooltipName}>
-                        {getCountryName(hoverInfo.country, 'deu')}
-                        <span className={styles.tooltipCca3}>({hoverInfo.country.cca3})</span>
+                    <div
+                        className={styles.tooltipInner}
+                        style={
+                            {
+                                '--tooltip-left': hoverInfo.showLeft ? 'auto' : `20px`,
+                                '--tooltip-right': hoverInfo.showLeft ? `30px` : 'auto',
+                            } as React.CSSProperties
+                        }
+                    >
+                        <div className={styles.tooltipName}>
+                            {getCountryName(hoverInfo.country, 'deu')}
+                            <span className={styles.tooltipCca3}>({hoverInfo.country.cca3})</span>
+                        </div>
+                        <div className={styles.tooltipCapital}>Hauptstadt: {getCapital(hoverInfo.country, 'deu')}</div>
                     </div>
-                    <div className={styles.tooltipCapital}>Hauptstadt: {getCapital(hoverInfo.country, 'deu')}</div>
                 </div>
             )}
             {/* Click-anywhere overlay to dismiss incorrect feedback */}

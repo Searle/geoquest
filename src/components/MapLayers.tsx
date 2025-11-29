@@ -5,6 +5,7 @@ import type { GeoPath } from 'd3-geo';
 import type { CountryData } from '../utils/countryData.js';
 import type { ZoomableZone } from '../utils/zoomableZones.js';
 import { Country } from './Country.js';
+import { MapZone } from './MapZone.js';
 
 import * as styles from './MapLayers.css.ts';
 
@@ -111,44 +112,15 @@ export const MapLayers = ({
             <svg viewBox={viewBox} className={clsx(styles.overlay, styles.noEvents)} xmlns='http://www.w3.org/2000/svg'>
                 {/* Zoomable zone indicators (only when not zoomed) */}
                 {!isZoomed &&
-                    zones.map((zone) => {
-                        const zoneWidth = zone.bounds.x1 - zone.bounds.x0;
-                        const zoneHeight = zone.bounds.y1 - zone.bounds.y0;
-                        // Icon positioned in top-right corner
-                        const iconX = zone.bounds.x1 - iconRadius - 1;
-                        const iconY = zone.bounds.y0 + iconRadius + 1;
-
-                        return (
-                            <g key={zone.id}>
-                                {/* Zone border - visual indicator only */}
-                                <rect
-                                    x={zone.bounds.x0}
-                                    y={zone.bounds.y0}
-                                    width={zoneWidth}
-                                    height={zoneHeight}
-                                    className={styles.zone}
-                                    vectorEffect='non-scaling-stroke'
-                                />
-
-                                {/* Zoom icon - shown when zone is hovered, clickable */}
-                                {hoveredZone === zone.id && (
-                                    <g className={styles.iconGroup} onClick={() => handleZoomToZone(zone)}>
-                                        {/* Background circle */}
-                                        <circle cx={iconX} cy={iconY} r={iconRadius} className={styles.iconCircle} />
-                                        {/* Magnifying glass icon */}
-                                        <text
-                                            x={iconX}
-                                            y={iconY}
-                                            fontSize={iconRadius * 1.2}
-                                            className={styles.iconText}
-                                        >
-                                            🔍
-                                        </text>
-                                    </g>
-                                )}
-                            </g>
-                        );
-                    })}
+                    zones.map((zone) => (
+                        <MapZone
+                            key={zone.id}
+                            zone={zone}
+                            isHovered={hoveredZone === zone.id}
+                            iconRadius={iconRadius}
+                            onZoomClick={handleZoomToZone}
+                        />
+                    ))}
             </svg>
         </>
     );

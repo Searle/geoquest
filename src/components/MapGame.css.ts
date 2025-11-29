@@ -13,6 +13,13 @@ export const tooltip = style({
     position: 'fixed',
     left: 'var(--tooltip-x)',
     top: 'var(--tooltip-y)',
+});
+
+export const tooltipInner = style({
+    position: 'absolute',
+    left: 'var(--tooltip-left)',
+    right: 'var(--tooltip-right)',
+    top: '0',
     backgroundColor: 'rgba(44, 62, 80, 0.95)',
     color: 'white',
     padding: '0.75rem 1rem',
