@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 
 import { getCountriesByRegion, type CountryData } from '../utils/countryData.js';
@@ -8,7 +8,7 @@ import type { ZoomableZone } from '../utils/zoomableZones.js';
 import { useMapProjection } from '../hooks/useMapProjection.js';
 import { MapLayers } from './MapLayers.js';
 
-import './RegionMap.css';
+import * as styles from './RegionMap.css.ts';
 
 interface CountryGeoData {
     country: CountryData;
@@ -173,7 +173,7 @@ const RegionMap = ({
     const unansweredCountries = countries.filter(({ country }) => !isAnsweredCorrectly(country));
 
     if (loading) {
-        return <div className='loading'>Karte wird geladen...</div>;
+        return <div className={styles.loading}>Karte wird geladen...</div>;
     }
 
     // Get highlight state for main SVG (only 'correct', hovered/incorrect in overlay)
@@ -192,8 +192,8 @@ const RegionMap = ({
     const viewBox1 = `${displayViewBox.x0} ${displayViewBox.y0} ${displayViewBox.width} ${displayViewBox.height}`;
 
     return (
-        <div className='region-map'>
-            <div className='region-map-inner' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+        <div className={styles.container}>
+            <div className={styles.inner} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
                 <MapLayers
                     answeredCountries={answeredCountries}
                     unansweredCountries={unansweredCountries}
@@ -215,7 +215,7 @@ const RegionMap = ({
 
             {/* Close button when zoomed */}
             {isZoomed && (
-                <button className='zoom-close-button' onClick={handleCloseZoom}>
+                <button className={styles.zoomButton} onClick={handleCloseZoom}>
                     ✕ Schliessen
                 </button>
             )}

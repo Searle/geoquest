@@ -281,39 +281,6 @@ function placeUniformZones(
 }
 
 /**
- * Clamp zone bounds to stay within viewBox
- */
-function clampToViewBox(
-    bounds: { x0: number; y0: number; x1: number; y1: number },
-    viewBox: ViewBox,
-    zoneWidth: number,
-    zoneHeight: number,
-): { x0: number; y0: number; x1: number; y1: number } {
-    const viewBoxX1 = viewBox.x0 + viewBox.width;
-    const viewBoxY1 = viewBox.y0 + viewBox.height;
-
-    // If zone extends beyond bounds, shift it inward
-    if (bounds.x0 < viewBox.x0) {
-        bounds.x0 = viewBox.x0;
-        bounds.x1 = viewBox.x0 + zoneWidth;
-    }
-    if (bounds.x1 > viewBoxX1) {
-        bounds.x1 = viewBoxX1;
-        bounds.x0 = viewBoxX1 - zoneWidth;
-    }
-    if (bounds.y0 < viewBox.y0) {
-        bounds.y0 = viewBox.y0;
-        bounds.y1 = viewBox.y0 + zoneHeight;
-    }
-    if (bounds.y1 > viewBoxY1) {
-        bounds.y1 = viewBoxY1;
-        bounds.y0 = viewBoxY1 - zoneHeight;
-    }
-
-    return bounds;
-}
-
-/**
  * Resolve overlapping zones by merging them based on actual overlap area
  */
 function resolveOverlaps(zones: ZoomableZone[], viewBox: ViewBox): ZoomableZone[] {

@@ -1,10 +1,9 @@
 import { GeoQuest } from './components/GeoQuest.js';
-
-import './App.css';
+import * as styles from './App.css.ts';
 
 export function App() {
     return (
-        <div className='app'>
+        <div className={styles.app}>
             <GeoQuest />
         </div>
     );

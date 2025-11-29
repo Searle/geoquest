@@ -4,7 +4,7 @@ import { type CountryData } from '../utils/countryData.js';
 import type { Region } from '../types/countries-json.js';
 import { regions, type GameMode, type OnSetGameMode } from '../types/game.js';
 
-import './GameHeader.css';
+import * as styles from './GameHeader.css.ts';
 
 interface GameHeaderProps {
     gameMode: GameMode;
@@ -31,18 +31,18 @@ export const GameHeader = ({
     onRegionChange,
     onSetGameMode,
 }: GameHeaderProps) => (
-    <div className={clsx('game-header', { 'game-header-game': gameMode !== 'discover' })}>
+    <div className={clsx(styles.header, { [styles.game]: gameMode !== 'discover' })}>
         {/* Discover Mode Header */}
         {gameMode === 'discover' && (
             <>
-                <div className='game-header-item'>
+                <div className={styles.item}>
                     <select value={region} onChange={(e) => onRegionChange(e.target.value as unknown as Region)}>
                         {regions.map((r) => (
                             <option key={r}>{r}</option>
                         ))}
                     </select>
                 </div>
-                <div className='game-header-item'>
+                <div className={styles.item}>
                     <span>Karte lernen:</span>
                     <button onClick={onSetGameMode['map-country']} disabled={countries.length === 0}>
                         Länder
@@ -62,22 +62,22 @@ export const GameHeader = ({
         )}
         {gameMode !== 'discover' && (
             <>
-                <div className='game-header-item'>
-                    <span className='quiz-score'>
+                <div className={styles.item}>
+                    <span className={styles.score}>
                         <span className='correct'>✔</span>
                         &nbsp;
                         {answeredCorrectly?.size ?? 0} / {randomizedCountries?.length ?? 0}
                     </span>
-                    <span className='quiz-click-on'>{label}:</span>
-                    <span className='quiz-question'>{value}</span>
+                    <span className={styles.label}>{label}:</span>
+                    <span className={styles.question}>{value}</span>
                 </div>
-                <div className='game-header-item'>
-                    <div className='quiz-score'>
+                <div className={styles.item}>
+                    <div className={styles.score}>
                         <span className='incorrect'>↻</span>
                         &nbsp;
                         {incorrectCount ?? 0}
                     </div>
-                    <button className='game-cancel-button' onClick={onSetGameMode['discover']}>
+                    <button className={styles.cancelButton} onClick={onSetGameMode['discover']}>
                         Abbrechen
                     </button>
                 </div>

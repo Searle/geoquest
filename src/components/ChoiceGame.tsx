@@ -15,7 +15,7 @@ import type { Region } from '../types/countries-json.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { speak, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
 
-import './ChoiceGame.css';
+import * as styles from './ChoiceGame.css.ts';
 
 interface ChoiceGameProps {
     gameMode: GameMode;
@@ -125,10 +125,10 @@ export const ChoiceGame = ({
         <>
             {header}
 
-            <div className='choice-game'>
+            <div className={styles.container}>
                 {/* Question Area */}
-                <div className={clsx('quiz-area', 'quiz-question-area')}>
-                    <div className={clsx('quiz-area', 'quiz-questions')}>
+                <div className={clsx(styles.area, styles.questionArea)}>
+                    <div className={clsx(styles.area, styles.questions)}>
                         {quizOptions.map((country) => (
                             <button key={country.cca3} onClick={() => handleOptionClick(country)}>
                                 {getAnswerValue(country)}
@@ -138,28 +138,28 @@ export const ChoiceGame = ({
                 </div>
 
                 {/* Answer Area */}
-                <div className={clsx('quiz-area', 'quiz-answer-area')}>
-                    <h3 className='answer-area-title'>Antworten:</h3>
-                    <div className='answer-list'>
+                <div className={clsx(styles.area, styles.answerArea)}>
+                    <h3 className={styles.title}>Antworten:</h3>
+                    <div className={styles.list}>
                         {answerHistory.length > 0 &&
                             answerHistory.map((item) => (
                                 <div
                                     key={item.timestamp}
-                                    className={clsx('answer-item', {
-                                        'answer-item-correct': item.isCorrect,
-                                        'answer-item-incorrect': !item.isCorrect,
+                                    className={clsx(styles.item, {
+                                        [styles.itemCorrect]: item.isCorrect,
+                                        [styles.itemIncorrect]: !item.isCorrect,
                                     })}
                                 >
-                                    <div className='answer-item-country'>{getQuestionValue(item.country)}</div>
-                                    <div className='answer-item-capital'>
+                                    <div className={styles.itemCountry}>{getQuestionValue(item.country)}</div>
+                                    <div className={styles.itemCapital}>
                                         {item.isCorrect ? (
-                                            <span className='answer-item-correct-mark'>✓</span>
+                                            <span className={styles.itemMarkCorrect}>✓</span>
                                         ) : (
-                                            <span className='answer-item-incorrect-mark'>✗</span>
+                                            <span className={styles.itemMarkIncorrect}>✗</span>
                                         )}
                                         {getAnswerValue(item.userAnswer)}
                                         {!item.isCorrect && (
-                                            <span className='answer-item-correct-answer'>
+                                            <span className={styles.itemAnswer}>
                                                 {' '}
                                                 (richtig: {getAnswerValue(item.country)})
                                             </span>

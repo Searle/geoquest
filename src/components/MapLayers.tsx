@@ -6,6 +6,8 @@ import type { CountryData } from '../utils/countryData.js';
 import type { ZoomableZone } from '../utils/zoomableZones.js';
 import { Country } from './Country.js';
 
+import * as styles from './MapLayers.css.ts';
+
 interface CountryGeoData {
     country: CountryData;
     feature: FeatureCollection | Feature<Geometry, GeoJsonProperties>;
@@ -59,7 +61,7 @@ export const MapLayers = ({
     return (
         <>
             {/* Main SVG - semi-static, only updates on quiz state changes */}
-            <svg viewBox={viewBox} className='region-map-svg' xmlns='http://www.w3.org/2000/svg'>
+            <svg viewBox={viewBox} className={styles.svg} xmlns='http://www.w3.org/2000/svg'>
                 {/* Answered countries (no shadow) */}
                 {answeredCountries.sort(sortCountries).map(({ country, feature }) => (
                     <Country
@@ -74,11 +76,7 @@ export const MapLayers = ({
                     />
                 ))}
             </svg>
-            <svg
-                viewBox={viewBox}
-                className={clsx('region-map-overlay', 'region-map-shadow')}
-                xmlns='http://www.w3.org/2000/svg'
-            >
+            <svg viewBox={viewBox} className={clsx(styles.overlay, styles.shadow)} xmlns='http://www.w3.org/2000/svg'>
                 {unansweredCountries.sort(sortCountries).map(({ country, feature }) => (
                     <Country
                         key={country.cca3}
@@ -94,11 +92,7 @@ export const MapLayers = ({
             </svg>
 
             {/* Overlay - renders hovered or incorrect country on top */}
-            <svg
-                viewBox={viewBox}
-                className={clsx('region-map-overlay', 'region-map-no-events')}
-                xmlns='http://www.w3.org/2000/svg'
-            >
+            <svg viewBox={viewBox} className={clsx(styles.overlay, styles.noEvents)} xmlns='http://www.w3.org/2000/svg'>
                 {overlayCountryData && overlayHighlight && (
                     <Country
                         key={overlayCountryData.country.cca3}
@@ -114,11 +108,7 @@ export const MapLayers = ({
                 )}
             </svg>
 
-            <svg
-                viewBox={viewBox}
-                className={clsx('region-map-overlay', 'region-map-no-events')}
-                xmlns='http://www.w3.org/2000/svg'
-            >
+            <svg viewBox={viewBox} className={clsx(styles.overlay, styles.noEvents)} xmlns='http://www.w3.org/2000/svg'>
                 {/* Zoomable zone indicators (only when not zoomed) */}
                 {!isZoomed &&
                     zones.map((zone) => {
@@ -136,21 +126,21 @@ export const MapLayers = ({
                                     y={zone.bounds.y0}
                                     width={zoneWidth}
                                     height={zoneHeight}
-                                    className='zoomable-zone'
+                                    className={styles.zone}
                                     vectorEffect='non-scaling-stroke'
                                 />
 
                                 {/* Zoom icon - shown when zone is hovered, clickable */}
                                 {hoveredZone === zone.id && (
-                                    <g className='zoom-icon-group' onClick={() => handleZoomToZone(zone)}>
+                                    <g className={styles.iconGroup} onClick={() => handleZoomToZone(zone)}>
                                         {/* Background circle */}
-                                        <circle cx={iconX} cy={iconY} r={iconRadius} className='zoom-icon-circle' />
+                                        <circle cx={iconX} cy={iconY} r={iconRadius} className={styles.iconCircle} />
                                         {/* Magnifying glass icon */}
                                         <text
                                             x={iconX}
                                             y={iconY}
                                             fontSize={iconRadius * 1.2}
-                                            className='zoom-icon-text'
+                                            className={styles.iconText}
                                         >
                                             🔍
                                         </text>

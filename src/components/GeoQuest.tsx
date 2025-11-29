@@ -9,7 +9,7 @@ import { MapGame } from './MapGame.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { initializeTTS } from '../utils/textToSpeech.js';
 
-import './GeoQuest.css';
+import * as styles from './GeoQuest.css.ts';
 
 export const GeoQuest = () => {
     const [region, setRegion] = useState<Region>('Africa');
@@ -61,7 +61,7 @@ export const GeoQuest = () => {
     );
 
     return (
-        <div className='geo-guess'>
+        <div className={styles.container}>
             {/* Choice Game Components */}
             {(gameMode === 'choice-capital' || gameMode === 'choice-country') && (
                 <ChoiceGame

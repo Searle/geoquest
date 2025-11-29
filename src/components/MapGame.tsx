@@ -14,7 +14,7 @@ import { GameHeader } from './GameHeader.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { speak, speakSequence, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
 
-import './MapGame.css';
+import * as styles from './MapGame.css.ts';
 
 interface HoverInfo {
     country: CountryData;
@@ -201,7 +201,7 @@ export const MapGame = ({
             {/* Hover tooltip */}
             {gameMode === 'discover' && hoverInfo && (
                 <div
-                    className='country-tooltip'
+                    className={styles.tooltip}
                     style={
                         {
                             '--tooltip-x': `${hoverInfo.x + 10}px`,
@@ -209,16 +209,16 @@ export const MapGame = ({
                         } as React.CSSProperties
                     }
                 >
-                    <div className='country-name'>
+                    <div className={styles.tooltipName}>
                         {getCountryName(hoverInfo.country, 'deu')}
-                        <span className='country-name-cca3'>({hoverInfo.country.cca3})</span>
+                        <span className={styles.tooltipCca3}>({hoverInfo.country.cca3})</span>
                     </div>
-                    <div className='country-capital'>Hauptstadt: {getCapital(hoverInfo.country, 'deu')}</div>
+                    <div className={styles.tooltipCapital}>Hauptstadt: {getCapital(hoverInfo.country, 'deu')}</div>
                 </div>
             )}
             {/* Click-anywhere overlay to dismiss incorrect feedback */}
             {(gameMode === 'map-country' || gameMode === 'map-capital') && feedback === 'incorrect' && (
-                <div className='dismiss-overlay' onClick={handleDismissIncorrect} />
+                <div className={styles.dismissOverlay} onClick={handleDismissIncorrect} />
             )}
             {/* Incorrect country label (quiz mode) */}
             {(gameMode === 'map-country' || gameMode === 'map-capital') &&
@@ -226,7 +226,7 @@ export const MapGame = ({
                 feedback === 'incorrect' &&
                 clickPosition && (
                     <div
-                        className='incorrect-country-label'
+                        className={styles.incorrectLabel}
                         style={
                             {
                                 '--label-x': `${clickPosition.x}px`,
@@ -239,10 +239,8 @@ export const MapGame = ({
                     >
                         {gameMode === 'map-capital' ? (
                             <>
-                                <div className='incorrect-country-label-capital'>
-                                    {getCapital(clickedCountry, 'deu')}
-                                </div>
-                                <div className='incorrect-country-label-country'>
+                                <div className={styles.incorrectLabelCapital}>{getCapital(clickedCountry, 'deu')}</div>
+                                <div className={styles.incorrectLabelCountry}>
                                     {getCountryName(clickedCountry, 'deu')}
                                 </div>
                             </>

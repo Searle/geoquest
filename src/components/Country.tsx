@@ -5,7 +5,7 @@ import type { GeoPath } from 'd3-geo';
 
 import type { CountryData } from '../types/countries-json.js';
 
-import './Country.css';
+import * as styles from './Country.css.ts';
 
 export const DEBUG_COUNTRY_MEMO = false;
 
@@ -105,21 +105,16 @@ export const Country = memo<CountryProps>(
                         <g key={`${country.cca3}-${index}`}>
                             {/* Invisible hit area with thick stroke for edges and fill for interior */}
                             {!forOverlay && hitAreaSize > 0 && (
-                                <path
-                                    d={pathData}
-                                    className='country-hit-area'
-                                    strokeWidth={hitAreaSize}
-                                    {...handlers}
-                                />
+                                <path d={pathData} className={styles.hitArea} strokeWidth={hitAreaSize} {...handlers} />
                             )}
                             {/* Visible path */}
                             <path
                                 d={pathData}
-                                className={clsx('country', {
-                                    hovered: highlightState === 'hovered',
-                                    'quiz-target': highlightState === 'correct',
-                                    'quiz-incorrect': highlightState === 'incorrect',
-                                    'country-no-pointer': forOverlay || hitAreaSize > 0,
+                                className={clsx(styles.country, {
+                                    [styles.hovered]: highlightState === 'hovered',
+                                    [styles.quizTarget]: highlightState === 'correct',
+                                    [styles.quizIncorrect]: highlightState === 'incorrect',
+                                    [styles.noPointer]: forOverlay || hitAreaSize > 0,
                                 })}
                                 data-country={country.cca3}
                                 vectorEffect='non-scaling-stroke'

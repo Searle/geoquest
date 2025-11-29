@@ -75,6 +75,7 @@ export function useZoomableZones({
 
         // Update previous count
         previousAnsweredCount.current = answeredCorrectlyCount;
+        return; // Satisfy noImplicitReturns
     }, [answeredCorrectlyCount, activeZone, closeZoom]);
 
     // Close zoom when incorrect feedback is dismissed
