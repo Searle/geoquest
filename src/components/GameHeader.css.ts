@@ -1,4 +1,4 @@
-import { style, globalStyle } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 
 export const header = style({
     display: 'flex',
@@ -46,11 +46,11 @@ export const score = style({
     textWrap: 'nowrap',
 });
 
-globalStyle(`${score} .correct`, {
+export const correct = style({
     fontWeight: 900,
     color: '#59fea1',
 });
 
-globalStyle(`${score} .incorrect`, {
+export const incorrect = style({
     color: '#ffdbd8',
 });

@@ -64,7 +64,7 @@ export const GameHeader = ({
             <>
                 <div className={styles.item}>
                     <span className={styles.score}>
-                        <span className='correct'>✔</span>
+                        <span className={styles.correct}>✔</span>
                         &nbsp;
                         {answeredCorrectly?.size ?? 0} / {randomizedCountries?.length ?? 0}
                     </span>
@@ -73,7 +73,7 @@ export const GameHeader = ({
                 </div>
                 <div className={styles.item}>
                     <div className={styles.score}>
-                        <span className='incorrect'>↻</span>
+                        <span className={styles.incorrect}>↻</span>
                         &nbsp;
                         {incorrectCount ?? 0}
                     </div>

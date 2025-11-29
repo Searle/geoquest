@@ -11,6 +11,7 @@ import {
 import { getCountryDataOptions } from '../utils/choiceOptions.js';
 import type { UseChoiceGame } from '../hooks/useChoiceGame.js';
 import { GameHeader } from './GameHeader.js';
+import { GameCompleted } from './GameCompleted.js';
 import type { Region } from '../types/countries-json.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { speak, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
@@ -106,19 +107,17 @@ export const ChoiceGame = ({
         return (
             <>
                 {header}
-                <div className='quiz-completed'>
-                    <h2>Yay, geschafft!</h2>
-                    <div className='final-score'>
-                        <div>Fehlversuche: {incorrectCount ?? 0}</div>
-                    </div>
-                    <button onClick={onSetGameMode[gameMode]}>Nochmal starten</button>
-                </div>
+                <GameCompleted
+                    gameMode={gameMode}
+                    incorrectCount={incorrectCount ?? 0}
+                    onRestart={onSetGameMode[gameMode]}
+                />
             </>
         );
     }
 
     if (!currentQuestion) {
-        return <div className='choice-game-loading'>Wird geladen...</div>;
+        return <div className={styles.loading}>Wird geladen...</div>;
     }
 
     return (

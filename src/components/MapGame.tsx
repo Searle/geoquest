@@ -11,6 +11,7 @@ import {
 import type { Region } from '../types/countries-json.js';
 import { type UseMapGame } from '../hooks/useMapGame.js';
 import { GameHeader } from './GameHeader.js';
+import { GameCompleted } from './GameCompleted.js';
 import type { GameMode, OnSetGameMode } from '../types/game.js';
 import { speak, speakSequence, getLanguageCodeForTTS } from '../utils/textToSpeech.js';
 
@@ -174,13 +175,11 @@ export const MapGame = ({
         return (
             <>
                 {header}
-                <div className='quiz-completed'>
-                    <h2>Yay, geschafft!</h2>
-                    <div className='final-score'>
-                        <div>Fehlversuche: {incorrectCount}</div>
-                    </div>
-                    <button onClick={() => onSetGameMode[gameMode]()}>Nochmal starten</button>
-                </div>
+                <GameCompleted
+                    gameMode={gameMode}
+                    incorrectCount={incorrectCount}
+                    onRestart={() => onSetGameMode[gameMode]()}
+                />
             </>
         );
     }
