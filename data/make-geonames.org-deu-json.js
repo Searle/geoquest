@@ -99,7 +99,7 @@ async function main() {
     };
 
     const jsonOutput = JSON.stringify(result, null, 4);
-    const outputPath = "geonames.org/ger.json";
+    const outputPath = "geonames.org/deu.json";
     fs.writeFileSync(outputPath, jsonOutput, 'utf8');
 
     console.log(`Successfully wrote German names data to ${outputPath}`);

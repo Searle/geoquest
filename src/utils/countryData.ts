@@ -1,5 +1,5 @@
 import countriesData from '../../data/github-mledoze-countries/countries.json' with { type: 'json' };
-import geonamesGermanData from '../../data/geonames.org/ger.json' with { type: 'json' };
+import geonamesGermanData from '../../data/geonames.org/deu.json' with { type: 'json' };
 
 import type { CountryData, Region } from '../types/countries-json.js';
 
