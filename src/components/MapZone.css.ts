@@ -19,11 +19,16 @@ export const iconGroup = style({
 });
 
 export const iconCircle = style({
-    fill: 'white',
+    fill: '#ffffff',
     stroke: '#2c3e50',
     strokeWidth: 1,
     opacity: 0.95,
     vectorEffect: 'non-scaling-stroke',
+    ':hover': {
+        fill: '#e5e5e5ff',
+        stroke: '#000000',
+        strokeWidth: 2,
+    },
 });
 
 export const iconText = style({

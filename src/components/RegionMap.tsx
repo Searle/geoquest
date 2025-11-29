@@ -220,9 +220,11 @@ const RegionMap = ({
 
             {/* Close button when zoomed */}
             {isZoomed && (
-                <button className={styles.zoomButton} onClick={handleCloseZoom}>
-                    ✕ Schliessen
-                </button>
+                <div className={styles.zoomButtonContainer}>
+                    <button className={styles.zoomButton} onClick={handleCloseZoom}>
+                        ✕ Schliessen
+                    </button>
+                </div>
             )}
         </div>
     );

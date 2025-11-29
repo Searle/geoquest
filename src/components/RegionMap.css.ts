@@ -27,11 +27,16 @@ export const loading = style({
     color: '#7f8c8d',
 });
 
-export const zoomButton = style({
+export const zoomButtonContainer = style({
     position: 'absolute',
-    top: '40px',
-    right: '40px',
-    padding: '8px 16px',
+    top: '20px',
+    left: '0',
+    right: '0',
+    display: 'flex',
+    justifyContent: 'center',
+});
+
+export const zoomButton = style({
     background: '#2c3e50',
     color: 'white',
     border: 'none',
