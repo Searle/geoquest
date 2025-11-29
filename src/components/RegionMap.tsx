@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 
 import { getCountriesByRegion, type CountryData } from '../utils/countryData.js';
@@ -45,6 +45,8 @@ const RegionMap = ({
     const [countries, setCountries] = useState<CountryGeoData[]>([]);
     const [loading, setLoading] = useState(true);
     const [hoveredZone, setHoveredZone] = useState<string | null>(null);
+    const [isZoomClosing, setIsZoomClosing] = useState(false);
+    const [isZoomOpening, setIsZoomOpening] = useState(false);
     const savedScrollPosition = useRef(0);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -88,20 +90,41 @@ const RegionMap = ({
     // Setup map projection
     const { pathGenerator, viewBox } = useMapProjection({ countries, region });
 
+    // Create a ref to hold the close function to avoid circular dependency
+    const closeZoomRef = useRef<(() => void) | null>(null);
+
+    // Create animated close zoom callback
+    const handleCloseZoom = useCallback(() => {
+        setIsZoomClosing(true);
+        // Wait for closing animation to complete
+        setTimeout(() => {
+            if (closeZoomRef.current) {
+                closeZoomRef.current();
+            }
+            setIsZoomClosing(false);
+            // Restore after a delay to let the DOM update
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (scrollContainerRef.current) {
+                        scrollContainerRef.current.scrollTop = savedScrollPosition.current;
+                    }
+                });
+            });
+        }, 200); // Match animation duration
+    }, []);
+
     // Zoomable zones
-    const {
-        zones,
-        activeZone,
-        zoomToZone: zoomToZoneBase,
-        closeZoom: closeZoomBase,
-        isZoomed,
-    } = useZoomableZones({
+    const { zones, activeZone, zoomToZone, closeZoom, isZoomed } = useZoomableZones({
         countries,
         pathGenerator,
         viewBox,
         answeredCorrectlyCount,
         hasIncorrectFeedback,
+        onCloseZoom: handleCloseZoom,
     });
+
+    // Store closeZoom in ref so handleCloseZoom can use it
+    closeZoomRef.current = closeZoom;
 
     // Wrapper to zoom to zone - save scroll position when opening zoom
     const handleZoomToZone = (zone: ZoomableZone) => {
@@ -109,20 +132,12 @@ const RegionMap = ({
             // Only save if not already zoomed
             savedScrollPosition.current = scrollContainerRef.current.scrollTop;
         }
-        zoomToZoneBase(zone);
-    };
-
-    // Wrapper to close zoom - restore scroll position
-    const handleCloseZoom = () => {
-        closeZoomBase();
-        // Restore after a delay to let the DOM update
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                if (scrollContainerRef.current) {
-                    scrollContainerRef.current.scrollTop = savedScrollPosition.current;
-                }
-            });
-        });
+        setIsZoomOpening(true);
+        // Wait for opening animation to complete
+        setTimeout(() => {
+            zoomToZone(zone);
+            setIsZoomOpening(false);
+        }, 200); // Match animation duration
     };
 
     // Update viewBox when zoomed
@@ -219,12 +234,19 @@ const RegionMap = ({
             </div>
 
             {/* Close button when zoomed */}
-            {isZoomed && (
-                <div className={styles.zoomButtonContainer}>
-                    <button className={styles.zoomButton} onClick={handleCloseZoom}>
-                        ✕ Schliessen
-                    </button>
-                </div>
+            {(isZoomed || isZoomClosing || isZoomOpening) && (
+                <>
+                    <div className={isZoomClosing ? styles.zoomBorderClosing : styles.zoomBorder}></div>
+                    <div className={styles.zoomButtonContainer}>
+                        <button
+                            className={styles.zoomButton}
+                            onClick={handleCloseZoom}
+                            disabled={isZoomClosing || isZoomOpening}
+                        >
+                            ✕ &nbsp; Schliessen
+                        </button>
+                    </div>
+                </>
             )}
         </div>
     );

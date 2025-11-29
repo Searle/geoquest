@@ -1,4 +1,4 @@
-import { style, globalStyle } from '@vanilla-extract/css';
+import { style, globalStyle, keyframes } from '@vanilla-extract/css';
 
 export const container = style({
     position: 'relative',
@@ -22,10 +22,53 @@ export const loading = style({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '400px',
+    minHeight: 400,
     fontSize: '1.2rem',
     color: '#7f8c8d',
 });
+
+const zoomBorderAnimation = keyframes({
+    '0%': {
+        margin: '30%',
+    },
+    '100%': {
+        margin: '0px',
+    },
+});
+
+const zoomBorderCloseAnimation = keyframes({
+    '0%': {
+        margin: '0px',
+    },
+    '100%': {
+        margin: '30%',
+    },
+});
+
+const zoomBorderBase = style({
+    position: 'absolute',
+    top: 40,
+    left: 10,
+    right: 30,
+    bottom: 10,
+    border: '2px dotted #000000',
+    pointerEvents: 'none',
+    zIndex: 9,
+});
+
+export const zoomBorder = style([
+    zoomBorderBase,
+    {
+        animation: `${zoomBorderAnimation} 0.2s ease-out`,
+    },
+]);
+
+export const zoomBorderClosing = style([
+    zoomBorderBase,
+    {
+        animation: `${zoomBorderCloseAnimation} 0.2s ease-in`,
+    },
+]);
 
 export const zoomButtonContainer = style({
     position: 'absolute',
@@ -37,20 +80,6 @@ export const zoomButtonContainer = style({
 });
 
 export const zoomButton = style({
-    background: '#2c3e50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    fontWeight: 500,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-    transition: 'background 0.2s ease',
     zIndex: 10,
-    ':hover': {
-        background: '#34495e',
-    },
-    ':active': {
-        background: '#1a252f',
-    },
+    paddingLeft: 16,
 });

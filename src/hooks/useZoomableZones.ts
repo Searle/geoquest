@@ -18,6 +18,7 @@ interface UseZoomableZonesParams {
     viewBox: ViewBox;
     answeredCorrectlyCount: number; // Track correct answers for auto-close
     hasIncorrectFeedback: boolean; // Don't auto-close if showing incorrect feedback
+    onCloseZoom?: () => void; // Optional callback to use when auto-closing (for animations)
 }
 
 interface UseZoomableZonesReturn {
@@ -38,6 +39,7 @@ export function useZoomableZones({
     viewBox,
     answeredCorrectlyCount,
     hasIncorrectFeedback,
+    onCloseZoom,
 }: UseZoomableZonesParams): UseZoomableZonesReturn {
     const [activeZone, setActiveZone] = useState<ZoomableZone | null>(null);
     const previousAnsweredCount = useRef(answeredCorrectlyCount);
@@ -59,6 +61,15 @@ export function useZoomableZones({
         setActiveZone(null);
     }, []);
 
+    // Use callback if provided (for animations), otherwise use direct closeZoom
+    const doCloseZoom = useCallback(() => {
+        if (onCloseZoom) {
+            onCloseZoom();
+        } else {
+            closeZoom();
+        }
+    }, [onCloseZoom, closeZoom]);
+
     // Auto-close zoom after correct answer
     useEffect(() => {
         // Detect correct answer (count increased)
@@ -66,17 +77,14 @@ export function useZoomableZones({
 
         if (activeZone !== null && correctAnswerGiven) {
             // Correct answer while zoomed - close after delay
-            const timer = setTimeout(() => {
-                closeZoom();
-            }, 1000);
-
+            const timer = setTimeout(doCloseZoom, 200);
             return () => clearTimeout(timer);
         }
 
         // Update previous count
         previousAnsweredCount.current = answeredCorrectlyCount;
         return; // Satisfy noImplicitReturns
-    }, [answeredCorrectlyCount, activeZone, closeZoom]);
+    }, [answeredCorrectlyCount, activeZone, doCloseZoom]);
 
     // Close zoom when incorrect feedback is dismissed
     useEffect(() => {
@@ -85,12 +93,12 @@ export function useZoomableZones({
 
         if (activeZone !== null && incorrectDismissed) {
             // Incorrect feedback dismissed - close zoom
-            closeZoom();
+            doCloseZoom();
         }
 
         // Update previous state
         previousIncorrectFeedback.current = hasIncorrectFeedback;
-    }, [hasIncorrectFeedback, activeZone, closeZoom]);
+    }, [hasIncorrectFeedback, activeZone, doCloseZoom]);
 
     const isZoomed = activeZone !== null;
 
